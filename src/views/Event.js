@@ -42,7 +42,16 @@ import {
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from 'react';
 import { getStatDescription, getRankings } from "api.js";
-import { DataGrid, GridColDef, GridValueGetterParams } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridValueGetterParams, GridToolbar, GridToolbarContainer, GridToolbarColumnsButton, GridToolbarFilterButton, GridToolbarExport } from '@mui/x-data-grid';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+  },
+});
+
 
 const Tables = () => {
   const [statDescription, setStatDescription] = useState([]);
@@ -63,7 +72,9 @@ const Tables = () => {
       field: 'id' , 
       headerName: '', 
       filterable: false,
-      renderCell:(index) => index.api.getRowIndex(index.row.key)+1
+      renderCell:(index) => index.api.getRowIndex(index.row.key)+1,
+      disableExport: true,
+      GridColDef: 'center'
     });
 
 
@@ -71,7 +82,7 @@ const Tables = () => {
       const stat = data.data[i];
       if (stat.report_stat) {
         keys.push(stat.stat_key);
-        statColumns.push({field: stat.stat_key, headerName: stat.display_name, type:"number"})
+        statColumns.push({field: stat.stat_key, headerName: stat.display_name, type:"number", sortable:true, headerAlign: 'center'})
       }
     }
 
@@ -79,11 +90,6 @@ const Tables = () => {
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
-
-
-    
-
-
 
   }
 
@@ -104,18 +110,6 @@ const Tables = () => {
     getRankings(year, eventKey, rankingsCallback)
 
   }, []);
-
-  const rows = [
-    // { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
-    // { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
-    // { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
-    // { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
-    // { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-    // { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-    // { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-    // { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-    // { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-  ];
 
   const columns = [
     { field: 'id', headerName: 'ID', width: 70 },
@@ -138,8 +132,23 @@ const Tables = () => {
     },
   ];
 
+  function customToolbar() {
+    return (
+      
+      <div className="text-white mb-0">
+        <GridToolbarContainer className="text-white mb-0">
+        <GridToolbarColumnsButton />
+        <GridToolbarExport />
+      </GridToolbarContainer>
+
+      </div>
+      
+    );
+  }
+
 
   return (
+    
     <>
       <Header />
       {/* Page content */}
@@ -147,11 +156,14 @@ const Tables = () => {
         {/* Table */}
         <Row>
           <div className="col">
-            <Card className="shadow">
-              <CardHeader className="border-0">
-                <h3 className="mb-0">Event Rankings</h3>
+            <Card className="bg-gradient-default shadow">
+              <CardHeader className="bg-transparent">
+                <h3 className="text-white mb-0">Event Rankings</h3>
               </CardHeader>
               <div style={{ height: 400, width: '100%' }}>
+
+              <ThemeProvider theme={darkTheme}>
+                {/* <CssBaseline /> */}
                 <DataGrid
                   rows={rankings}
                   getRowId={row=>{
@@ -160,9 +172,23 @@ const Tables = () => {
                   columns={statColumns}
                   pageSize={100}
                   rowsPerPageOptions={[100]}
-                  checkboxSelection
+                  // checkboxSelection
+                  components={{ Toolbar: customToolbar }}
                   // getRowId= {(row) => row.code}
+
+                  sx={{
+                    boxShadow: 2,
+                    border: 0,
+                    borderColor: 'white',
+                    '& .MuiDataGrid-cell:hover': {
+                      color: 'white',
+                    },
+                    // color: 'white',
+                    
+                  }}
                 />
+              </ThemeProvider>
+                
               </div>
             </Card>
           </div>

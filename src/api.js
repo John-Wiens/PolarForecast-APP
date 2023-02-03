@@ -1,9 +1,4 @@
-const API_KEY = "ar4AZMs0exe7RmAAgh4N5jMc2fm96UaE5gZftbP7Yi12SMPgoxX4gtvAVZ3CDBK9";
-const url = "http://172.27.212.77:8081/2022/code/stats";
-const API_ENDPOINT = "http://172.27.212.77:8081";
-
-
-
+const API_ENDPOINT = "http://172.27.212.77:8085"; //https://polarforecast.azurewebsites.net/
 
 export const getStatDescription = async (year, event, callback) => {
     try {

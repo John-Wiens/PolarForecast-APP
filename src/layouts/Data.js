@@ -71,7 +71,7 @@ const Data = (props) => {
         routes={routes}
         logo={{
           innerLink: "/data/index",
-          imgSrc: require("../assets/img/brand/argon-react.png"),
+          imgSrc: require("../assets/img/brand/PolarbearHead.png"),
           imgAlt: "..."
         }}
       />
