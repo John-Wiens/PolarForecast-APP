@@ -33,7 +33,6 @@ const Footer = () => {
               rel="noopener noreferrer"
               target="_blank"
             >
-              John Wiens
             </a>
           </div>
         </Col>

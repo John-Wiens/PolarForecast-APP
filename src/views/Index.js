@@ -64,8 +64,13 @@ const Index = (props) => {
   return (
     <>
       <Header />
-      {/* Page content */}
-      <Container className="mt--7" fluid>
+      <img
+        alt="Image placeholder"
+        src="../src/assets/img/theme/team-4-800x800.jpg"
+      />
+
+
+      {/* <Container className="mt--7" fluid>
         <Row>
           <Col className="mb-5 mb-xl-0" xl="8">
             <Card className="bg-gradient-default shadow">
@@ -109,7 +114,6 @@ const Index = (props) => {
                 </Row>
               </CardHeader>
               <CardBody>
-                {/* Chart */}
                 <div className="chart">
                   <Line
                     data={chartExample1[chartExample1Data]}
@@ -133,7 +137,6 @@ const Index = (props) => {
                 </Row>
               </CardHeader>
               <CardBody>
-                {/* Chart */}
                 <div className="chart">
                   <Bar
                     data={chartExample2.data}
@@ -330,7 +333,7 @@ const Index = (props) => {
             </Card>
           </Col>
         </Row>
-      </Container>
+      </Container> */}
     </>
   );
 };
