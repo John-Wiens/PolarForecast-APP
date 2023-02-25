@@ -18,22 +18,9 @@
 import { Link } from "react-router-dom";
 // reactstrap components
 import {
-  DropdownMenu,
-  DropdownItem,
-  UncontrolledDropdown,
-  DropdownToggle,
-  Form,
-  FormGroup,
-  InputGroupAddon,
-  InputGroupText,
-  Input,
-  InputGroup,
   Navbar,
-  Nav,
-  Container,
-  Media
+  Container
 } from "reactstrap";
-
 import * as React from 'react';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -50,8 +37,6 @@ const AdminNavbar = (props) => {
       terms.push({"label":String(data.data[i].key), "page": data.data[i].page});
     }
     setSearchKeys(terms);
-    console.log(terms);
-    console.log();
   }
 
 
@@ -79,7 +64,6 @@ const AdminNavbar = (props) => {
             sx={{ width: 300 }}
               renderInput={(params) => <TextField {...params} label="Search" />}
               onChange={(event, newValue) => {
-              console.log(event, newValue);
               window.location.href=newValue.page;
             }}
           />

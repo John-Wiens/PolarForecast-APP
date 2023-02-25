@@ -23,6 +23,7 @@ import Login from "views/examples/Login.js";
 import Tables from "views/examples/Tables.js";
 import Icons from "views/examples/Icons.js";
 import Event from "views/Event.js";
+import Team from "views/Team.js";
 
 var routes = [
   // {

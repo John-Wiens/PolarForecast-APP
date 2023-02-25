@@ -1,8 +1,20 @@
-const API_ENDPOINT = "http://172.27.212.77:8085"; //https://polarforecast.azurewebsites.net/
+const API_ENDPOINT = "http://172.30.97.213:8085"; //https://polarforecast.azurewebsites.net/
 
 export const getStatDescription = async (year, event, callback) => {
     try {
         const endpoint = `${API_ENDPOINT}/${year}/${event}/stat_description`;
+        console.log("Requesting Data from: " + endpoint);
+        const response = await fetch(endpoint);
+        const data = await response.json()
+        callback(data);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export const getTeamStatDescription = async (year, event, team, callback) => {
+    try {
+        const endpoint = `${API_ENDPOINT}/${year}/${event}/${team}/stats`;
         console.log("Requesting Data from: " + endpoint);
         const response = await fetch(endpoint);
         const data = await response.json()
