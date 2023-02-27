@@ -17,21 +17,22 @@
 */
 
 // reactstrap components
-import picture from "../../assets/img/brand/PolarbearHead.png"
-import { Link } from 'react-router-dom';
-
+import picture from "../../assets/img/brand/PolarbearHead.png";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
     <>
-      <div className="header bg-gradient-info pb-1 pt-4 pt-md-0" 
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}>
+      <div
+        className="header bg-gradient-info pb-1 pt-4 pt-md-0"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
         <Link to="/data/index">
-          <img src={picture} alt={"logo"}/>
+          <img src={picture} alt={"logo"} />
         </Link>
       </div>
     </>

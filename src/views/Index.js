@@ -17,16 +17,13 @@
 */
 import Chart from "chart.js";
 
-import {
-  chartOptions,
-  parseOptions
-} from "variables/charts.js";
+import { chartOptions, parseOptions } from "variables/charts.js";
 
 import Search from "./Search.js";
 import Header from "components/Headers/Header.js";
+import Snowfall from "react-snowfall";
 
 const Index = (props) => {
-
   if (window.Chart) {
     parseOptions(Chart, chartOptions());
   }
@@ -34,7 +31,18 @@ const Index = (props) => {
   return (
     <>
       <Header />
-      <Search></Search>
+
+      <div style={{ height: "calc(100vh - 180px)", width: "100%" }}>
+        <Snowfall
+          snowflakeCount={50}
+          style={{
+            position: "fixed",
+            width: "100vw",
+            height: "100vh",
+          }}
+        ></Snowfall>
+        <Search></Search>
+      </div>
     </>
   );
 };

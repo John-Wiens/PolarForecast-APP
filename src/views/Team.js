@@ -98,7 +98,7 @@ const Team = () => {
   }, []);
 
   useEffect(async () => {
-    await new Promise((r) => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 100));
     updateData(teamInfo, keys);
     setLoading(false);
   }, [teamInfo, keys]);
@@ -112,7 +112,7 @@ const Team = () => {
             <ThemeProvider theme={theme}>
               <Box
                 sx={{
-                  bgcolor: '#429BEF',
+                  bgcolor: "#429BEF",
                   boxShadow: 1,
                   borderRadius: 2.5,
                   display: "inline-flex",
@@ -120,11 +120,15 @@ const Team = () => {
                   justifyContent: "center",
                   p: 1,
                   m: 0.5,
-                  width: '48%'
+                  width: "48%",
                 }}
               >
-                <Box sx={{ color: "text.secondary", width: '100%'}}>{stat.fieldName.toUpperCase()}</Box>
-                <Box sx={{ color: "text.primary", width: '100%', fontSize: 25, fontWeight: "medium" }}>
+                <Box sx={{ color: "text.secondary", width: "100%" }}>
+                  {stat.fieldName.toUpperCase()}
+                </Box>
+                <Box
+                  sx={{ color: "text.primary", width: "100%", fontSize: 25, fontWeight: "medium" }}
+                >
                   {stat.fieldValue}
                 </Box>
               </Box>

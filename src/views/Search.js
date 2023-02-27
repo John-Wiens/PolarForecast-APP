@@ -1,5 +1,3 @@
-
-
 /*!
 
 =========================================================
@@ -18,49 +16,46 @@
 
 */
 import React from "react";
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import {getSearchKeys} from "api.js";
-
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+import { getSearchKeys } from "api.js";
 
 const Search = () => {
   const [searchKeys, setSearchKeys] = React.useState([]);
 
-
-  const searchKeyCallback = async(data)=>{
+  const searchKeyCallback = async (data) => {
     const terms = [];
-    for(let i=0; i< data.data.length; i++){
-      if ("key" in data.data[i]){
-        terms.push({"label":String(data.data[i].key), "page": data.data[i].page});
+    for (let i = 0; i < data.data.length; i++) {
+      if ("key" in data.data[i]) {
+        terms.push({ label: String(data.data[i].key), page: data.data[i].page });
       }
     }
+    console.log(data);
     setSearchKeys(terms);
-  }
+  };
 
-  React.useEffect(()=> {
-    getSearchKeys(searchKeyCallback)
-
+  React.useEffect(() => {
+    getSearchKeys(searchKeyCallback);
   }, []);
 
   return (
-    <div 
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      margin: 20
-    }}>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: 20,
+      }}
+    >
       <Autocomplete
-          id="combo-box-demo"
-          options={
-            searchKeys? searchKeys : []
-          }
-          sx={{ width: 300 }}
-            renderInput={(params) => <TextField {...params} label="Search" />}
-            onChange={(event, newValue) => {
-            window.location.href=newValue.page;
-          }}
-        />
+        id="combo-box-demo"
+        options={searchKeys ? searchKeys : []}
+        sx={{ width: 300 }}
+        renderInput={(params) => <TextField {...params} label="Search" />}
+        onChange={(event, newValue) => {
+          window.location.href = newValue.page;
+        }}
+      />
     </div>
   );
 };
