@@ -67,7 +67,7 @@ const Team = () => {
       return a < b ? -1 : a > b ? 1 : 0;
     });
     const temp = {
-      fieldName: "team",
+      fieldName: "team number",
       fieldValue: teamInfo["key"].replace("frc", ""),
     };
     tempValues.push(temp);
