@@ -280,11 +280,11 @@ const Tables = () => {
         </Tabs>
       </AppBar>
       {/* <SwipeableViews
-        axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+        axis={darkTheme.direction === "rtl" ? "x-reverse" : "x"}
         index={value}
         onChangeIndex={handleChangeIndex}
       > */}
-      <TabPanel value={value} index={0} dir={theme.direction}>
+      <TabPanel value={value} index={0} dir={darkTheme.direction}>
         <ThemeProvider theme={darkTheme}>
           <Container>
             {/* Table */}
@@ -324,7 +324,7 @@ const Tables = () => {
           </Container>
         </ThemeProvider>
       </TabPanel>
-      <TabPanel value={value} index={1} dir={theme.direction}>
+      <TabPanel value={value} index={1} dir={darkTheme.direction}>
         <ThemeProvider theme={darkTheme}>
           <Container>
             {/* Table */}
@@ -361,7 +361,7 @@ const Tables = () => {
           </Container>
         </ThemeProvider>
       </TabPanel>
-      {/* <TabPanel value={value} index={2} dir={theme.direction}>
+      {/* <TabPanel value={value} index={2} dir={darkTheme.direction}>
               Polar Bear Stats
             </TabPanel> */}
       {/* </SwipeableViews> */}

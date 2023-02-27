@@ -18,12 +18,12 @@
 // reactstrap components
 
 // core components
-import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getStatDescription, getTeamStatDescription } from "api.js";
-import { createTheme } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import Box from "@mui/material/Box";
 
-const darkTheme = createTheme({
+const theme = createTheme({
   palette: {
     mode: "dark",
   },
@@ -109,11 +109,26 @@ const Team = () => {
         Object.keys(reportedStats).map((e, i) => {
           const stat = reportedStats[i];
           return (
-            <div style={{ display: "flex", justifyContent: "center" }}>
-              <h3>
-                {stat.fieldName} : {stat.fieldValue}
-              </h3>
-            </div>
+            <ThemeProvider theme={theme}>
+              <Box
+                sx={{
+                  bgcolor: '#429BEF',
+                  boxShadow: 1,
+                  borderRadius: 2,
+                  display: "inline-flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  p: 1,
+                  m: 1,
+                  width: '45%'
+                }}
+              >
+                <Box sx={{ color: "text.secondary", width: '100%'}}>{stat.fieldName.toUpperCase()}</Box>
+                <Box sx={{ color: "text.primary", width: '100%', fontSize: 25, fontWeight: "medium" }}>
+                  {stat.fieldValue}
+                </Box>
+              </Box>
+            </ThemeProvider>
           );
         })}
     </>
