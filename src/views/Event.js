@@ -49,6 +49,7 @@ const Tables = () => {
   const history = useHistory();
 
   const [statDescription, setStatDescription] = useState([]);
+  const [eventTitle, setEventTitle] = useState("");
   const [rankings, setRankings] = useState([]);
   const [predictions, setPredictions] = useState([]);
   const [showKeys, setShowKeys] = useState([]);
@@ -207,13 +208,14 @@ const Tables = () => {
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
-    if (params[4] !== "team") {
-      const year = params[3];
-      const eventKey = params[4];
-      getStatDescription(year, eventKey, statDescriptionCallback);
-      getRankings(year, eventKey, rankingsCallback);
-      getMatchPredictions(year, eventKey, predictionsCallback);
-    }
+    const year = params[3];
+    const eventKey = params[4];
+    getStatDescription(year, eventKey, statDescriptionCallback);
+    getRankings(year, eventKey, rankingsCallback);
+    getMatchPredictions(year, eventKey, predictionsCallback);
+
+    setEventTitle(eventKey.toUpperCase());
+    
   }, []);
 
   function customToolbar() {
@@ -239,7 +241,7 @@ const Tables = () => {
         {...other}
       >
         {value === index && (
-          <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 205px)" }}>
+          <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 210px)" }}>
             <Typography>{children}</Typography>
           </Box>
         )}
@@ -293,10 +295,11 @@ const Tables = () => {
                 {/* Table */}
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Event Rankings</h3>
+                    <h3 className="text-white mb-0">{eventTitle} Event Rankings</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid
+                      disableColumnMenu
                       rows={rankings}
                       getRowId={(row) => {
                         return row.key;
@@ -332,10 +335,11 @@ const Tables = () => {
               <div className="col">
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Match Predictions</h3>
+                    <h3 className="text-white mb-0">{eventTitle} Match Predictions</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid
+                      disableColumnMenu
                       rows={predictions}
                       getRowId={(row) => {
                         return row.key;
