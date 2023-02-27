@@ -114,13 +114,13 @@ const Team = () => {
                 sx={{
                   bgcolor: '#429BEF',
                   boxShadow: 1,
-                  borderRadius: 2,
+                  borderRadius: 2.5,
                   display: "inline-flex",
                   flexDirection: "column",
                   justifyContent: "center",
                   p: 1,
-                  m: 1,
-                  width: '45%'
+                  m: 0.5,
+                  width: '48%'
                 }}
               >
                 <Box sx={{ color: "text.secondary", width: '100%'}}>{stat.fieldName.toUpperCase()}</Box>
