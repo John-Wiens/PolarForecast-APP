@@ -38,9 +38,9 @@ const Selector = () => {
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
-    if (params[5].substring(0,3) === "frc"){
+    if (params[5].substring(0,5) === "team-"){
       setType("team");
-    } else {
+    } else if (params[5].substring(0,6) === "match-"){
       setType("match");
     }
 

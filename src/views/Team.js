@@ -47,11 +47,11 @@ const Team = () => {
     const tempKeys = [];
     for (let i = 0; i < data.data.length; i++) {
       const stat = data.data[i];
-      if (Array.from(stat.stat_key)[0] !== "_" ) {
+      if (Array.from(stat.stat_key)[0] !== "_") {
         tempKeys.push({
-          "key":stat.stat_key,
-          "name":stat.display_name
-      });
+          key: stat.stat_key,
+          name: stat.display_name,
+        });
       }
       setKeys(tempKeys);
     }
@@ -60,20 +60,26 @@ const Team = () => {
 
   const updateData = (info, list) => {
     let tempValues = [];
+    list.sort(function (a, b) {
+      a = a.name.toLowerCase();
+      b = b.name.toLowerCase();
+
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
     const temp = {
-      "fieldName": "team",
-      "fieldValue": teamInfo["key"]
-    }
+      fieldName: "team",
+      fieldValue: teamInfo["key"].replace("frc", ""),
+    };
     tempValues.push(temp);
     for (const key of list) {
-      for (const fieldName in info){
+      for (const fieldName in info) {
         if (fieldName === key.key) {
-          const value = Math.round(info[fieldName]* 100) / 100;
+          const value = Math.round(info[fieldName] * 100) / 100;
           const temp = {
-            "fieldName": key.name,
-            "fieldValue": value
-          }
-          tempValues.push(temp)
+            fieldName: key.name,
+            fieldValue: value,
+          };
+          tempValues.push(temp);
         }
       }
     }
@@ -85,33 +91,31 @@ const Team = () => {
     const params = url.pathname.split("/");
     const year = params[3];
     const eventKey = params[4];
-    const team = params[5];
-    
+    const team = params[5].replace("team-", "frc");
+
     getStatDescription(year, eventKey, statDescriptionCallback);
     getTeamStatDescription(year, eventKey, team, teamStatsCallback);
-    
   }, []);
 
-  useEffect( async () => {
-    await new Promise(r => setTimeout(r, 500));
-    updateData(teamInfo,keys);
+  useEffect(async () => {
+    await new Promise((r) => setTimeout(r, 500));
+    updateData(teamInfo, keys);
     setLoading(false);
   }, [teamInfo, keys]);
 
   return (
     <>
-      { !loading &&
+      {!loading &&
         Object.keys(reportedStats).map((e, i) => {
           const stat = reportedStats[i];
           return (
-            <div style={{display: 'flex', justifyContent: 'center'}}>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <h3>
                 {stat.fieldName} : {stat.fieldValue}
               </h3>
             </div>
           );
-        })
-      }
+        })}
     </>
   );
 };

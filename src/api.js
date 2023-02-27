@@ -1,4 +1,4 @@
-const API_ENDPOINT = "http://172.30.97.213:8085"; //https://polarforecast.azurewebsites.net/
+const API_ENDPOINT = "http://172.25.81.54:8085"; //https://polarforecast.azurewebsites.net/
 
 export const getStatDescription = async (year, event, callback) => {
     try {
