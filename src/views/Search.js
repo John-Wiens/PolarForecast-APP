@@ -30,10 +30,11 @@ const Search = () => {
   const searchKeyCallback = async(data)=>{
     const terms = [];
     for(let i=0; i< data.data.length; i++){
-      terms.push({"label":String(data.data[i].key), "page": data.data[i].page});
+      if ("key" in data.data[i]){
+        terms.push({"label":String(data.data[i].key), "page": data.data[i].page});
+      }
     }
     setSearchKeys(terms);
-
   }
 
   React.useEffect(()=> {

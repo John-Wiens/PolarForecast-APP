@@ -27,28 +27,12 @@ import routes from "routes.js";
 const Data = (props) => {
   const mainContent = React.useRef(null);
   const location = useLocation();
-  const [searchKeys, setSearchKeys] = React.useState([]);
 
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
     document.scrollingElement.scrollTop = 0;
     mainContent.current.scrollTop = 0;
   }, [location]);
-
-
-  const searchKeyCallback = async(data)=>{
-    const terms = [];
-    for(let i=0; i< data.data.length; i++){
-      terms.push({"label":String(data.data[i].key), "page": data.data[i].page});
-    }
-    setSearchKeys(terms);
-
-  }
-
-  React.useEffect(()=> {
-    getSearchKeys(searchKeyCallback)
-
-  }, []);
 
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
