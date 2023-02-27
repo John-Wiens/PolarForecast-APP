@@ -16,21 +16,14 @@
 
 */
 import React from "react";
-//import ReactDOM from "react-dom/client";
 import ReactDOM from "react-dom"; // Gets built in github, but fails in deployment
-//import { createRoot } from 'react-dom/client'; // fails to build in github
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
 import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
 
-import AdminLayout from "layouts/Admin.js";
-import AuthLayout from "layouts/Auth.js";
 import DataLayout from "layouts/Data.js";
-
-//const root = ReactDOM.createRoot(document.getElementById("root"));
-
 
 ReactDOM.render(
   <BrowserRouter>
