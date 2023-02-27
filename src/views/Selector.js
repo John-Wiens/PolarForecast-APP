@@ -19,44 +19,38 @@
 
 // core components
 import Header from "components/Headers/Header.js";
-import React, { useEffect, useState } from "react";
-import { getStatDescription, getTeamStatDescription } from "api.js";
-import { createTheme } from "@mui/material/styles";
-import Team from "./Team.js"
-import Match from "./Match.js"
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import React, { useEffect } from "react";
+import Team from "./Team.js";
+import Match from "./Match.js";
+import Snowfall from "react-snowfall";
 
 const Selector = () => {
   const [type, setType] = React.useState("");
 
-
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
-    if (params[5].substring(0,5) === "team-"){
+    if (params[5].substring(0, 5) === "team-") {
       setType("team");
-    } else if (params[5].substring(0,6) === "match-"){
+    } else if (params[5].substring(0, 6) === "match-") {
       setType("match");
     }
-
-
   }, []);
 
   return (
     <>
       <Header />
 
-      { type === 'team' &&
-        <Team/>
-      }
-      { type === 'match' &&
-        <Match/>
-      }
+      {type === "team" && <Team />}
+      {type === "match" && <Match />}
+      <Snowfall
+        snowflakeCount={50}
+        style={{
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+        }}
+      ></Snowfall>
     </>
   );
 };

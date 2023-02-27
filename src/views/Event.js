@@ -38,6 +38,7 @@ import { useHistory } from "react-router-dom";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import { IconButton } from "@mui/material";
+import Snowfall from "react-snowfall";
 
 const darkTheme = createTheme({
   palette: {
@@ -187,8 +188,9 @@ const Tables = () => {
       team.key = team.key.replace("frc", "");
     }
     data.data.sort(function (a, b) {
-      return a.key - b.key;
+      return a.OPR - b.OPR;
     });
+    data.data.reverse();
     setRankings(data.data);
   };
 
@@ -215,7 +217,6 @@ const Tables = () => {
     getMatchPredictions(year, eventKey, predictionsCallback);
 
     setEventTitle(eventKey.toUpperCase());
-    
   }, []);
 
   function customToolbar() {
@@ -260,10 +261,6 @@ const Tables = () => {
     setValue(newValue);
   };
 
-  const handleChangeIndex = (index) => {
-    setValue(index);
-  };
-
   return (
     <>
       <Header />
@@ -281,11 +278,7 @@ const Tables = () => {
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-      {/* <SwipeableViews
-        axis={darkTheme.direction === "rtl" ? "x-reverse" : "x"}
-        index={value}
-        onChangeIndex={handleChangeIndex}
-      > */}
+
       <TabPanel value={value} index={0} dir={darkTheme.direction}>
         <ThemeProvider theme={darkTheme}>
           <Container>
@@ -308,7 +301,6 @@ const Tables = () => {
                       pageSize={100}
                       rowsPerPageOptions={[100]}
                       components={{ Toolbar: customToolbar }}
-                      // getRowId= {(row) => row.code}
                       sx={{
                         mx: 0.5,
                         border: 0,
@@ -365,11 +357,14 @@ const Tables = () => {
           </Container>
         </ThemeProvider>
       </TabPanel>
-      {/* <TabPanel value={value} index={2} dir={darkTheme.direction}>
-              Polar Bear Stats
-            </TabPanel> */}
-      {/* </SwipeableViews> */}
-      {/* </Box> */}
+      <Snowfall
+        snowflakeCount={50}
+        style={{
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+        }}
+      ></Snowfall>
     </>
   );
 };

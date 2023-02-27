@@ -63,7 +63,8 @@
     "react-swipeable-views": "^0.14.0",
     "reactstrap": "8.9.0",
     "sass": "1.54.5",
-    "@mui/icons-material": "5.11.9"
+    "@mui/icons-material": "5.11.9",
+    "react-snowfall": "1.2.1"
   },
   "devDependencies": {
     "gulp": "4.0.2",

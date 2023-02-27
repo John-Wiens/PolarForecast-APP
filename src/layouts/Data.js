@@ -20,7 +20,6 @@ import { useLocation, Route, Switch, Redirect } from "react-router-dom";
 import { Container } from "reactstrap";
 import AdminFooter from "components/Footers/AdminFooter.js";
 import Selector from "views/Selector.js";
-import {getSearchKeys} from "api.js";
 
 import routes from "routes.js";
 
@@ -37,13 +36,7 @@ const Data = (props) => {
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/data" && prop.path === "/index") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            component={prop.component}
-            key={key}
-          />
-        );
+        return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
       } else if (prop.layout === "/data" && prop.path === "/event") {
         return (
           <Route
@@ -60,18 +53,6 @@ const Data = (props) => {
         return null;
       }
     });
-  };
-
-  const getBrandText = (path) => {
-    for (let i = 0; i < routes.length; i++) {
-      if (
-        props.location.pathname.indexOf(routes[i].layout + routes[i].path) !==
-        -1
-      ) {
-        return routes[i].name;
-      }
-    }
-    return "Brand";
   };
 
   return (
