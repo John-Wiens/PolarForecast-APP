@@ -61,7 +61,8 @@ const Tables = () => {
       headerName: "Match",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align:'center',
       flex: 0.5,
     },
     {
@@ -69,7 +70,8 @@ const Tables = () => {
       headerName: "Blue Score",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align:'center',
       flex: 0.5,
     },
     {
@@ -77,7 +79,8 @@ const Tables = () => {
       headerName: "Red Score",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align:'center',
       flex: 0.5,
     },
     {
@@ -85,6 +88,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
+      align:'center',
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {
@@ -97,34 +101,18 @@ const Tables = () => {
       },
     },
   ]);
-  const [statRows, setStatRows] = useState([]);
-  const theme = useTheme();
   const [value, setValue] = React.useState(0);
-
-  const [search, setSearch] = useState("");
 
   const statDescriptionCallback = async (data) => {
     const keys = [];
     const statColumns = [];
 
-    // Setup a Column for Row Numbers
-    // statColumns.push({
-    //   field: "id",
-    //   headerName: "",
-    //   filterable: false,
-    //   renderCell: (index) => index.api.getRowIndex(index.row.key) + 1,
-    //   disableExport: true,
-    //   GridColDef: "center",
-    //   minWidth: 5,
-    //   flex: 0.5
-    // });
-
     statColumns.push({
       field: "key",
       headerName: "Team",
       filterable: false,
-      //renderCell:(index) => index.api.getRowIndex(index.row.key)+i,
-      GridColDef: "center",
+      headerAlign: "center",
+      align:'center',
       minWidth: 75,
       flex: 0.5,
     });
@@ -139,6 +127,7 @@ const Tables = () => {
           type: "number",
           sortable: true,
           headerAlign: "center",
+          align:'center',
           minWidth: 70,
           flex: 0.5,
         });
@@ -150,6 +139,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
+      align:'center',
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {

@@ -33,6 +33,7 @@ const Selector = () => {
     if (params[5].substring(0, 5) === "team-") {
       setType("team");
     } else if (params[5].substring(0, 6) === "match-") {
+      console.log("match");
       setType("match");
     }
   }, []);
