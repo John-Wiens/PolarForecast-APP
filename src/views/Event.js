@@ -169,7 +169,6 @@ const Tables = () => {
 
   const statisticsTeamOnClick = (cellValues) => {
     const url = new URL(window.location.href);
-    console.log(cellValues);
     const eventKey = url.pathname.split("/")[4];
     history.push(eventKey + "/team-" + cellValues.key);
   };
@@ -177,14 +176,11 @@ const Tables = () => {
   const statisticsMatchOnClick = (cellValues) => {
     const url = new URL(window.location.href);
     const eventKey = url.pathname.split("/")[4];
-    console.log(cellValues);
     history.push(eventKey + "/match-" + cellValues.key);
   };
 
   const rankingsCallback = async (data) => {
-    const filteredRankings = [];
     for (const team of data.data) {
-      console.log(team);
       team.key = team.key.replace("frc", "");
     }
     data.data.sort(function (a, b) {
