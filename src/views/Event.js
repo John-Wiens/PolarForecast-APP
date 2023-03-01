@@ -27,7 +27,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
-import { getStatDescription, getRankings, getMatchPredictions } from "api.js";
+import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -171,11 +171,16 @@ const Tables = () => {
 
   const rankingsCallback = async (data) => {
 
-    data.data = data.data.filter((obj) => { if (obj.key) {return obj}})
-
+    data.data = data.data.filter((obj) => { if (obj.key) {return true}})
     for (const team of data?.data) {
       if (team.key){ 
         team.key = team.key.replace("frc", "");
+      }
+      console.log(team);
+      for (const [key,value] of Object.entries(team)){
+        if (typeof (value) === "number" && key.toLowerCase() !== "rank" && key !== "expectedRanking" && key.toLowerCase() !== "schedule"){
+          team[key] = team[key]?.toFixed(1);
+        }
       }
     }
     data.data.sort(function (a, b) {
@@ -189,6 +194,11 @@ const Tables = () => {
     const qmData = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
+        for (const [key,value] of Object.entries(match)){
+          if (typeof (value) === "number" && key.toLowerCase() !== "match_number"){
+            match[key] = match[key]?.toFixed(1);
+          }
+        }
         qmData.push(match);
       }
     }
@@ -198,16 +208,29 @@ const Tables = () => {
     setPredictions(qmData);
   };
 
+  const searchKeysCallback = async (data) => {
+    const url = new URL(window.location.href);
+    const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4]
+
+    for (let i = 0; i < data.data.length; i++) {
+      if (data.data[i]?.key === eventName) {
+        setEventTitle(data.data[i]?.display)
+      }
+    }
+
+  };
+
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
     const year = params[3];
     const eventKey = params[4];
+
     getStatDescription(year, eventKey, statDescriptionCallback);
     getRankings(year, eventKey, rankingsCallback);
     getMatchPredictions(year, eventKey, predictionsCallback);
+    getSearchKeys(searchKeysCallback);
 
-    setEventTitle(eventKey.toUpperCase());
   }, []);
 
   function customToolbar() {
@@ -279,7 +302,7 @@ const Tables = () => {
                 {/* Table */}
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">{eventTitle} Event Rankings</h3>
+                    <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid
@@ -318,7 +341,7 @@ const Tables = () => {
               <div className="col">
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">{eventTitle} Match Predictions</h3>
+                    <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid

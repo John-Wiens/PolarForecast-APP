@@ -111,6 +111,10 @@ const Team = () => {
 
   const teamPredictionsCallback = async (data) => {
     const rows = [];
+    const url = new URL(window.location.href);
+    const params = url.pathname.split("/");
+    const team = params[5].replace("team-", "frc");
+
     data.data.sort(function (a, b) {
       return a.match_number - b.match_number;
     });
@@ -118,9 +122,9 @@ const Team = () => {
     for (let i = 0; i < data.data.length; i++) {
       if (data.data[i].comp_level === "qm") {
         let color = "UNKOWN";
-        if (data.data[i].blue_teams.find((obj) => obj === teamNumber)){
+        if (data.data[i].blue_teams.find((obj) => obj === team)){
           color = "Blue";
-        } else if (data.data[i].red_teams.find((obj) => obj === teamNumber)){
+        } else if (data.data[i].red_teams.find((obj) => obj === team)){
           color = "Red";
         }
         rows.push({
@@ -189,7 +193,7 @@ const Team = () => {
     const params = url.pathname.split("/");
     const year = params[3];
     const eventKey = params[4];
-    const team = params[5].replace("team-", "frc");
+    const team = params[5].replace("team-", "");
     setTeamNumber(team);
 
     setColumns(
@@ -198,14 +202,14 @@ const Team = () => {
         ["Match", "Team Color", "Blue Score", "Red Score"]
       )
     );
-    getTeamMatchPredictions(year, eventKey, team, teamPredictionsCallback);
+    getTeamMatchPredictions(year, eventKey, "frc" + team, teamPredictionsCallback);
 
     getStatDescription(year, eventKey, statDescriptionCallback);
-    getTeamStatDescription(year, eventKey, team, teamStatsCallback);
+    getTeamStatDescription(year, eventKey, "frc" + team, teamStatsCallback);
   }, []);
 
   useEffect(async () => {
-    await new Promise((r) => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 250));
     updateData(teamInfo, keys);
     setLoading(false);
   }, [teamInfo, keys]);
@@ -265,7 +269,7 @@ const Team = () => {
                 <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Team {teamNumber.replace("frc", "").toString()} Schedule</h3>
+                      <h3 className="text-white mb-0">Team {teamNumber} Schedule</h3>
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
                       <DataGrid
