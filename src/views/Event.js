@@ -27,7 +27,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
-import { getStatDescription, getRankings, getMatchPredictions } from "api.js";
+import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -61,7 +61,8 @@ const Tables = () => {
       headerName: "Match",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align: "center",
       flex: 0.5,
     },
     {
@@ -69,7 +70,8 @@ const Tables = () => {
       headerName: "Blue Score",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align: "center",
       flex: 0.5,
     },
     {
@@ -77,7 +79,8 @@ const Tables = () => {
       headerName: "Red Score",
       filterable: false,
       disableExport: true,
-      GridColDef: "center",
+      headerAlign: "center",
+      align: "center",
       flex: 0.5,
     },
     {
@@ -85,6 +88,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
+      align: "center",
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {
@@ -97,34 +101,18 @@ const Tables = () => {
       },
     },
   ]);
-  const [statRows, setStatRows] = useState([]);
-  const theme = useTheme();
   const [value, setValue] = React.useState(0);
-
-  const [search, setSearch] = useState("");
 
   const statDescriptionCallback = async (data) => {
     const keys = [];
     const statColumns = [];
 
-    // Setup a Column for Row Numbers
-    // statColumns.push({
-    //   field: "id",
-    //   headerName: "",
-    //   filterable: false,
-    //   renderCell: (index) => index.api.getRowIndex(index.row.key) + 1,
-    //   disableExport: true,
-    //   GridColDef: "center",
-    //   minWidth: 5,
-    //   flex: 0.5
-    // });
-
     statColumns.push({
       field: "key",
       headerName: "Team",
       filterable: false,
-      //renderCell:(index) => index.api.getRowIndex(index.row.key)+i,
-      GridColDef: "center",
+      headerAlign: "center",
+      align: "center",
       minWidth: 75,
       flex: 0.5,
     });
@@ -139,6 +127,7 @@ const Tables = () => {
           type: "number",
           sortable: true,
           headerAlign: "center",
+          align: "center",
           minWidth: 70,
           flex: 0.5,
         });
@@ -150,6 +139,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
+      align: "center",
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {
@@ -169,7 +159,6 @@ const Tables = () => {
 
   const statisticsTeamOnClick = (cellValues) => {
     const url = new URL(window.location.href);
-    console.log(cellValues);
     const eventKey = url.pathname.split("/")[4];
     history.push(eventKey + "/team-" + cellValues.key);
   };
@@ -177,15 +166,22 @@ const Tables = () => {
   const statisticsMatchOnClick = (cellValues) => {
     const url = new URL(window.location.href);
     const eventKey = url.pathname.split("/")[4];
-    console.log(cellValues);
     history.push(eventKey + "/match-" + cellValues.key);
   };
 
   const rankingsCallback = async (data) => {
-    const filteredRankings = [];
-    for (const team of data.data) {
+
+    data.data = data.data.filter((obj) => { if (obj.key) {return true}})
+    for (const team of data?.data) {
+      if (team.key){ 
+        team.key = team.key.replace("frc", "");
+      }
       console.log(team);
-      team.key = team.key.replace("frc", "");
+      for (const [key,value] of Object.entries(team)){
+        if (typeof (value) === "number" && key.toLowerCase() !== "rank" && key !== "expectedRanking" && key.toLowerCase() !== "schedule"){
+          team[key] = team[key]?.toFixed(1);
+        }
+      }
     }
     data.data.sort(function (a, b) {
       return a.OPR - b.OPR;
@@ -198,6 +194,11 @@ const Tables = () => {
     const qmData = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
+        for (const [key,value] of Object.entries(match)){
+          if (typeof (value) === "number" && key.toLowerCase() !== "match_number"){
+            match[key] = match[key]?.toFixed(1);
+          }
+        }
         qmData.push(match);
       }
     }
@@ -207,16 +208,29 @@ const Tables = () => {
     setPredictions(qmData);
   };
 
+  const searchKeysCallback = async (data) => {
+    const url = new URL(window.location.href);
+    const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4]
+
+    for (let i = 0; i < data.data.length; i++) {
+      if (data.data[i]?.key === eventName) {
+        setEventTitle(data.data[i]?.display)
+      }
+    }
+
+  };
+
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
     const year = params[3];
     const eventKey = params[4];
+
     getStatDescription(year, eventKey, statDescriptionCallback);
     getRankings(year, eventKey, rankingsCallback);
     getMatchPredictions(year, eventKey, predictionsCallback);
+    getSearchKeys(searchKeysCallback);
 
-    setEventTitle(eventKey.toUpperCase());
   }, []);
 
   function customToolbar() {
@@ -288,7 +302,7 @@ const Tables = () => {
                 {/* Table */}
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">{eventTitle} Event Rankings</h3>
+                    <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid
@@ -327,7 +341,7 @@ const Tables = () => {
               <div className="col">
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">{eventTitle} Match Predictions</h3>
+                    <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                     <DataGrid

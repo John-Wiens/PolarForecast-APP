@@ -30,7 +30,6 @@ const Search = () => {
         terms.push({ label: String(data.data[i].display), page: data.data[i].page });
       }
     }
-    console.log(data);
     setSearchKeys(terms);
   };
 

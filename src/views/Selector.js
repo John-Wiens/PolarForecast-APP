@@ -29,13 +29,11 @@ const Selector = () => {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const params = url.pathname.split("/");
-    if (params[5].substring(0, 5) === "team-") {
-      setType("team");
-    } else if (params[5].substring(0, 6) === "match-") {
-      setType("match");
+    const urlType = url.pathname.split("/")[5].split("-")[0];
+    if (type !== urlType) {
+      setType(urlType);
     }
-  }, []);
+  }, [window.location.href]);
 
   return (
     <>
