@@ -62,7 +62,7 @@ const Tables = () => {
       filterable: false,
       disableExport: true,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       flex: 0.5,
     },
     {
@@ -71,7 +71,7 @@ const Tables = () => {
       filterable: false,
       disableExport: true,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       flex: 0.5,
     },
     {
@@ -80,7 +80,7 @@ const Tables = () => {
       filterable: false,
       disableExport: true,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       flex: 0.5,
     },
     {
@@ -88,7 +88,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {
@@ -112,7 +112,7 @@ const Tables = () => {
       headerName: "Team",
       filterable: false,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       minWidth: 75,
       flex: 0.5,
     });
@@ -127,7 +127,7 @@ const Tables = () => {
           type: "number",
           sortable: true,
           headerAlign: "center",
-          align:'center',
+          align: "center",
           minWidth: 70,
           flex: 0.5,
         });
@@ -139,7 +139,7 @@ const Tables = () => {
       headerName: "Info",
       sortable: false,
       headerAlign: "center",
-      align:'center',
+      align: "center",
       flex: 0.5,
       minWidth: 70,
       renderCell: (params) => {
@@ -170,8 +170,13 @@ const Tables = () => {
   };
 
   const rankingsCallback = async (data) => {
-    for (const team of data.data) {
-      team.key = team.key.replace("frc", "");
+
+    data.data = data.data.filter((obj) => { if (obj.key) {return obj}})
+
+    for (const team of data?.data) {
+      if (team.key){ 
+        team.key = team.key.replace("frc", "");
+      }
     }
     data.data.sort(function (a, b) {
       return a.OPR - b.OPR;

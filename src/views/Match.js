@@ -40,64 +40,123 @@ const darkTheme = createTheme({
   },
 });
 
-
 const generateColumns = (fieldName, headerName) => {
   const tempColumns = [];
-  let i = 0;
-  while (i <= 3) {
+  const length = fieldName.length;
+  for (let i = 0; i < length; i++) {
     let newColumn = {
       field: "",
       headerName: "",
       filterable: false,
       disableExport: true,
+      sortable: false,
       headerAlign: "center",
       align: "center",
       flex: 0.5,
-      key: i
+      key: i + 1,
     };
     if (i === 0) {
-      newColumn.headerName = "Blue Team";
-      newColumn.field = "blue_team" ;
-    } else if (i === 1) {
-      newColumn.headerName = "Blue " + headerName;
-      newColumn.field = "blue_" + fieldName;
-    } else if (i === 2) {
-      newColumn.headerName = "Red " + headerName;
-      newColumn.field = "red_" + fieldName;
-    } else if (i === 3) {
-      newColumn.headerName = "Red Team";
-      newColumn.field = "red_team" ;
+      const obj = { ...newColumn };
+      obj.headerName = "Team";
+      obj.field = "team";
+      obj.key = i;
+      tempColumns.push(obj);
     }
+    newColumn.headerName = headerName[i];
+    newColumn.field = fieldName[i];
     tempColumns.push(newColumn);
-    i = i + 1;
   }
-  console.log(tempColumns);
+
   return tempColumns;
 };
 
 const Match = () => {
   const [tableColumns, setTableColumns] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const [data, setData] = useState([]);
 
-  const [oprColumns, setOprColumns] = useState([generateColumns("opr", "OPR")]);
-  const [oprRows, setOprRows] = useState([
-    {
-      key: 0,
-      blue_team: "4499",
-      blue_opr: 50,
-      red_opr: 20,
-      red_team: "1619",
-    },
-  ]);
+  const [columns, setColumns] = useState([]);
+  const [blueRows, setBlueRows] = useState([]);
+  const [redRows, setRedRows] = useState([]);
+  const [blueWinner, setBlueWinner] = useState(false);
+  const [redWinner, setRedWinner] = useState(false);
 
-  
+  const matchInfoCallback = async (restData) => {
+    setData(restData);
+    let newRow = {};
 
-  const matchInfoCallback = async (data) => {
-    console.log(data);
-    return data;
+    const blueAutoRows = [];
+    let i = 0;
+    let blueAutoScore = 0;
+    let blueChargeStation = 0;
+    let blueTeleop = 0;
+    for (const team of restData?.blue_teams) {
+      newRow = {
+        key: i,
+        team: team.key.replace("frc", ""),
+        auto_score: team.autoPoints.toFixed(1),
+        auto_charge_station: team.autoChargeStation.toFixed(1),
+        teleop_score: team.teleopPoints.toFixed(1),
+        end_game: team.endgamePoints.toFixed(1),
+      };
+      blueAutoRows.push(newRow);
+      i = i + 1;
+      blueAutoScore = blueAutoScore + team.autoPoints;
+      blueChargeStation = blueChargeStation + team.autoChargeStation;
+      blueTeleop = blueTeleop + team.teleopPoints;
+    }
+    newRow = {
+      key: 4,
+      team: "Alliance",
+      auto_score: blueAutoScore?.toFixed(1),
+      auto_charge_station: blueChargeStation?.toFixed(1),
+      teleop_score: blueTeleop?.toFixed(1),
+      end_game: restData?.prediction.blue_endGame?.toFixed(1),
+    };
+    blueAutoRows.push(newRow);
+
+    setBlueRows(blueAutoRows);
+
+    const redAutoRows = [];
+    i = 0;
+    let redAutoScore = 0;
+    let redChargeStation = 0;
+    let redTeleop = 0;
+    for (const team of restData?.red_teams) {
+      newRow = {
+        key: i,
+        team: team.key.replace("frc", ""),
+        auto_score: team.autoPoints.toFixed(1),
+        auto_charge_station: team.autoChargeStation.toFixed(1),
+        teleop_score: team.teleopPoints.toFixed(1),
+        end_game: team.endgamePoints.toFixed(1),
+      };
+      redAutoRows.push(newRow);
+      i = i + 1;
+      redAutoScore = redAutoScore + team.autoPoints;
+      redChargeStation = redChargeStation + team.autoChargeStation;
+      redTeleop = redTeleop + team.teleopPoints;
+    }
+    newRow = {
+      key: 4,
+      team: "Alliance",
+      auto_score: redAutoScore?.toFixed(1),
+      auto_charge_station: redChargeStation?.toFixed(1),
+      teleop_score: redTeleop?.toFixed(1),
+      end_game: restData?.prediction.red_endGame?.toFixed(1),
+    };
+    redAutoRows.push(newRow);
+    setRedRows(redAutoRows);
+
+    if (restData?.match.winning_alliance === "red") {
+      setRedWinner(true);
+    } else if (restData?.match.winning_alliance === "blue") {
+      setBlueWinner(true);
+    }
+
+    setLoading(false);
   };
-
-  
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -105,80 +164,93 @@ const Match = () => {
     const year = params[3];
     const eventKey = params[4];
     const match = params[5].split("-")[1];
-
+    setColumns(
+      generateColumns(
+        ["auto_score", "auto_charge_station", "teleop_score", "end_game"],
+        ["Auto Score", "Charge Station", "Teleop Score", "End Game"]
+      )
+    );
     getMatchDetails(year, eventKey, match, matchInfoCallback);
-    // console.log(generateColumns("auto", "Auto"));
   }, []);
-
-  // function TabPanel(props) {
-  //   const { children, value, index, ...other } = props;
-  //   return (
-  //     <div
-  //       role="tabpanel"
-  //       hidden={value !== index}
-  //       id={`full-width-tabpanel-${index}`}
-  //       aria-labelledby={`full-width-tab-${index}`}
-  //       // style={{width: "100%"}}
-  //       {...other}
-  //     >
-  //       {value === index && (
-  //         <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 210px)" }}>
-  //           <Typography>{children}</Typography>
-  //         </Box>
-  //       )}
-  //     </div>
-  //   );
-  // }
 
   return (
     <>
-      <ThemeProvider theme={darkTheme}>
-        {/* <div style={{ height: "calc(100vh - 175px)", overflow: "scroll" }}> */}
-          <Container>
-            {/* <Row>
-              <div style={{ width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">BLUE 65 POINTS - RED 40 POINTS</h3>
-                  </CardHeader>
-                </Card>
-              </div>
-            </Row> */}
+      {!loading && (
+        <ThemeProvider theme={darkTheme}>
+          <div style={{ height: "calc(100vh + 25px)", width: "100%" }}>
+            <Container>
+              <Row>
+                <div style={{ width: "100%" }}>
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h1 className="text-white mb-0">Match {data.prediction.match_number}</h1>
+                      <h3 className="text-white mb-0">
+                        BLUE {Math.round(data.prediction.blue_score)} POINTS - RED{" "}
+                        {Math.round(data.prediction.red_score)} POINTS
+                      </h3>
+                    </CardHeader>
+                  </Card>
+                </div>
+              </Row>
 
-            <Row>
-              <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">OPR Comparison</h3>
-                  </CardHeader>
-                  <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                    <DataGrid
-                      disableColumnMenu
-                      rows={oprRows}
-                      getRowId={(row) => {
-                        return row.key;
-                      }}
-                      columns={oprColumns}
-                      pageSize={100}
-                      rowsPerPageOptions={[100]}
-                      sx={{
-                        mx: 0.5,
-                        border: 0,
-                        borderColor: "white",
-                        "& .MuiDataGrid-cell:hover": {
-                          color: "white",
-                        },
-
-                        // color: 'white',
-                      }}
-                    />
-                  </div>
-                </Card>
-              </div>
-            </Row>
-          </Container>
-        {/* </div> */}
-      </ThemeProvider>
+              <Row>
+                <div style={{ width: "100%" }}>
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
+                    </CardHeader>
+                    <div style={{ height: "320px", width: "100%" }}>
+                      <DataGrid
+                        disableColumnMenu
+                        rows={blueRows}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={columns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        sx={{
+                          mx: 0.5,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                      />
+                    </div>
+                  </Card>
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Red Alliance {redWinner && " - Winner"}</h3>
+                    </CardHeader>
+                    <div style={{ height: "320px", width: "100%" }}>
+                      <DataGrid
+                        disableColumnMenu
+                        rows={redRows}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={columns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        sx={{
+                          mx: 0.5,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </Row>
+            </Container>
+          </div>
+        </ThemeProvider>
+      )}
     </>
   );
 };

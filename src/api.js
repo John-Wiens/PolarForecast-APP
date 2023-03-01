@@ -1,5 +1,5 @@
-// const API_ENDPOINT = "http://172.19.55.26:8085"; 
-const API_ENDPOINT = "https://polarforecast.azurewebsites.net/"; 
+const API_ENDPOINT = "http://172.19.55.26:8085"; 
+// const API_ENDPOINT = "https://polarforecast.azurewebsites.net/"; 
 
 export const getStatDescription = async (year, event, callback) => {
     try {
@@ -64,6 +64,18 @@ export const getSearchKeys = async (callback) => {
 export const getMatchDetails = async (year, event, matchKey, callback) => {
     try {
         const endpoint = `${API_ENDPOINT}/${year}/${event}/${matchKey}/match_details`;
+        console.log("Requesting Data from: " + endpoint);
+        const response = await fetch(endpoint);
+        const data = await response.json()
+        callback(data);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+export const getTeamMatchPredictions = async (year, event, team, callback) => {
+    try {
+        const endpoint = `${API_ENDPOINT}/${year}/${event}/${team}/predictions`;
         console.log("Requesting Data from: " + endpoint);
         const response = await fetch(endpoint);
         const data = await response.json()

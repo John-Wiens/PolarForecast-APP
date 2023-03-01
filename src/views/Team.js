@@ -16,12 +16,27 @@
 
 */
 // reactstrap components
+import { Card, CardHeader, Container, Row } from "reactstrap";
 
 // core components
-import React, { useEffect, useState } from "react";
-import { getStatDescription, getTeamStatDescription } from "api.js";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import AppBar from "@mui/material/AppBar";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
+import React, { useEffect, useState } from "react";
+import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import InfoIcon from "@mui/icons-material/Info";
+import { IconButton } from "@mui/material";
+import { useHistory } from "react-router-dom";
+
+import {
+  DataGrid,
+  GridToolbarContainer,
+  GridToolbarColumnsButton,
+  GridToolbarExport,
+} from "@mui/x-data-grid";
 
 const theme = createTheme({
   palette: {
@@ -30,12 +45,95 @@ const theme = createTheme({
 });
 
 const Team = () => {
+  const history = useHistory();
+
   const [loading, setLoading] = React.useState(true);
 
   const [teamInfo, setTeamInfo] = React.useState("");
   const [statDescription, setStatDescription] = useState([]);
   const [keys, setKeys] = useState([]);
   const [reportedStats, setReportedStats] = useState([]);
+  const [value, setValue] = React.useState(0);
+  const [teamNumber, setTeamNumber] = useState();
+
+  const [columns, setColumns] = useState([]);
+  const [matchesRows, setMatchesRows] = useState([]);
+
+  const generateColumns = (fieldName, headerName) => {
+    const tempColumns = [];
+    const length = fieldName.length;
+    for (let i = 0; i < length; i++) {
+      let newColumn = {
+        field: "",
+        headerName: "",
+        filterable: false,
+        disableExport: true,
+        sortable: false,
+        headerAlign: "center",
+        align: "center",
+        flex: 0.5,
+        key: i,
+      };
+      newColumn.headerName = headerName[i];
+      newColumn.field = fieldName[i];
+      tempColumns.push(newColumn);
+
+      if (i === length - 1) {
+        tempColumns.push({
+          field: "info",
+          headerName: "Info",
+          filterable: false,
+          disableExport: true,
+          sortable: false,
+          headerAlign: "center",
+          align: "center",
+          flex: 0.5,
+          key: i + 1,
+          renderCell: (params) => {
+            const onClick = (e) => statisticsMatchOnClick(params.row);
+            return (
+              <IconButton onClick={onClick}>
+                <InfoIcon />{" "}
+              </IconButton>
+            );
+          },
+        });
+      }
+    }
+
+    return tempColumns;
+  };
+
+  const statisticsMatchOnClick = (cellValues) => {
+    history.push("match-" + cellValues.key);
+    // history.go(0)
+  };
+
+  const teamPredictionsCallback = async (data) => {
+    const rows = [];
+    data.data.sort(function (a, b) {
+      return a.match_number - b.match_number;
+    });
+    
+    for (let i = 0; i < data.data.length; i++) {
+      if (data.data[i].comp_level === "qm") {
+        let color = "UNKOWN";
+        if (data.data[i].blue_teams.find((obj) => obj === teamNumber)){
+          color = "Blue";
+        } else if (data.data[i].red_teams.find((obj) => obj === teamNumber)){
+          color = "Red";
+        }
+        rows.push({
+          key: data.data[i].key,
+          match_number: data.data[i].match_number,
+          alliance_color: color,
+          blue_score: data.data[i].blue_score.toFixed(1),
+          red_score: data.data[i].red_score.toFixed(1),
+        });
+      }
+    }
+    setMatchesRows(rows);
+  };
 
   const teamStatsCallback = async (data) => {
     setTeamInfo(data);
@@ -68,7 +166,7 @@ const Team = () => {
     });
     const temp = {
       fieldName: "team number",
-      fieldValue: teamInfo["key"].replace("frc", ""),
+      fieldValue: teamInfo["key"]?.replace("frc", ""),
     };
     tempValues.push(temp);
     for (const key of list) {
@@ -92,6 +190,15 @@ const Team = () => {
     const year = params[3];
     const eventKey = params[4];
     const team = params[5].replace("team-", "frc");
+    setTeamNumber(team);
+
+    setColumns(
+      generateColumns(
+        ["match_number", "alliance_color", "blue_score", "red_score"],
+        ["Match", "Team Color", "Blue Score", "Red Score"]
+      )
+    );
+    getTeamMatchPredictions(year, eventKey, team, teamPredictionsCallback);
 
     getStatDescription(year, eventKey, statDescriptionCallback);
     getTeamStatDescription(year, eventKey, team, teamStatsCallback);
@@ -103,38 +210,127 @@ const Team = () => {
     setLoading(false);
   }, [teamInfo, keys]);
 
+  function TabPanel(props) {
+    const { children, value, index, ...other } = props;
+    return (
+      <div
+        role="tabpanel"
+        hidden={value !== index}
+        id={`full-width-tabpanel-${index}`}
+        aria-labelledby={`full-width-tab-${index}`}
+        // style={{width: "100%"}}
+        {...other}
+      >
+        {value === index && (
+          <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 210px)" }}>
+            <Typography>{children}</Typography>
+          </Box>
+        )}
+      </div>
+    );
+  }
+
+  function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      "aria-controls": `full-width-tabpanel-${index}`,
+    };
+  }
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
+
   return (
     <>
-      {!loading &&
-        Object.keys(reportedStats).map((e, i) => {
-          const stat = reportedStats[i];
-          return (
-            <ThemeProvider theme={theme}>
-              <Box
-                sx={{
-                  bgcolor: "#429BEF",
-                  boxShadow: 1,
-                  borderRadius: 2.5,
-                  display: "inline-flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  p: 1,
-                  m: 0.5,
-                  width: "48%",
-                }}
-              >
-                <Box sx={{ color: "text.secondary", width: "100%" }}>
-                  {stat.fieldName.toUpperCase()}
-                </Box>
+      <AppBar position="static">
+        <Tabs
+          value={value}
+          onChange={handleChange}
+          indicatorColor="secondary"
+          textColor="inherit"
+          variant="fullWidth"
+          aria-label="full width tabs"
+        >
+          <Tab label="Schedule" {...a11yProps(0)} />
+          <Tab label="Team Stats" {...a11yProps(1)} />
+          {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
+        </Tabs>
+      </AppBar>
+      <TabPanel value={value} index={0} dir={theme.direction}>
+        <ThemeProvider theme={theme}>
+          <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
+            <Container>
+              <Row>
+                <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Team {teamNumber.replace("frc", "").toString()} Schedule</h3>
+                    </CardHeader>
+                    <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
+                      <DataGrid
+                        disableColumnMenu
+                        rows={matchesRows}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={columns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        sx={{
+                          mx: 0.5,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </Row>
+            </Container>
+          </div>
+        </ThemeProvider>
+      </TabPanel>
+      <TabPanel value={value} index={1} dir={theme.direction}>
+        {!loading &&
+          Object.keys(reportedStats).map((e, i) => {
+            const stat = reportedStats[i];
+            return (
+              <ThemeProvider theme={theme}>
                 <Box
-                  sx={{ color: "text.primary", width: "100%", fontSize: 25, fontWeight: "medium" }}
+                  sx={{
+                    bgcolor: "#429BEF",
+                    boxShadow: 1,
+                    borderRadius: 2.5,
+                    display: "inline-flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    p: 1,
+                    m: 0.5,
+                    width: "48%",
+                  }}
                 >
-                  {stat.fieldValue}
+                  <Box sx={{ color: "text.secondary", width: "100%" }}>
+                    {stat.fieldName.toUpperCase()}
+                  </Box>
+                  <Box
+                    sx={{
+                      color: "text.primary",
+                      width: "100%",
+                      fontSize: 25,
+                      fontWeight: "medium",
+                    }}
+                  >
+                    {stat.fieldValue}
+                  </Box>
                 </Box>
-              </Box>
-            </ThemeProvider>
-          );
-        })}
+              </ThemeProvider>
+            );
+          })}
+      </TabPanel>
     </>
   );
 };
