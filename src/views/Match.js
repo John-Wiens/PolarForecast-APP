@@ -71,7 +71,6 @@ const generateColumns = (fieldName, headerName) => {
 };
 
 const Match = () => {
-  const [tableColumns, setTableColumns] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [data, setData] = useState([]);

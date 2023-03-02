@@ -118,13 +118,13 @@ const Team = () => {
     data.data.sort(function (a, b) {
       return a.match_number - b.match_number;
     });
-    
+
     for (let i = 0; i < data.data.length; i++) {
       if (data.data[i].comp_level === "qm") {
         let color = "UNKOWN";
-        if (data.data[i].blue_teams.find((obj) => obj === team)){
+        if (data.data[i].blue_teams.find((obj) => obj === team)) {
           color = "Blue";
-        } else if (data.data[i].red_teams.find((obj) => obj === team)){
+        } else if (data.data[i].red_teams.find((obj) => obj === team)) {
           color = "Red";
         }
         rows.push({
@@ -199,7 +199,7 @@ const Team = () => {
     setColumns(
       generateColumns(
         ["match_number", "alliance_color", "blue_score", "red_score"],
-        ["Match", "Team Color", "Blue Score", "Red Score"]
+        ["Match", "Color", "Blue Score", "Red Score"]
       )
     );
     getTeamMatchPredictions(year, eventKey, "frc" + team, teamPredictionsCallback);
@@ -258,7 +258,6 @@ const Team = () => {
         >
           <Tab label="Schedule" {...a11yProps(0)} />
           <Tab label="Team Stats" {...a11yProps(1)} />
-          {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0} dir={theme.direction}>
@@ -299,41 +298,49 @@ const Team = () => {
         </ThemeProvider>
       </TabPanel>
       <TabPanel value={value} index={1} dir={theme.direction}>
-        {!loading &&
-          Object.keys(reportedStats).map((e, i) => {
-            const stat = reportedStats[i];
-            return (
-              <ThemeProvider theme={theme}>
-                <Box
-                  sx={{
-                    bgcolor: "#429BEF",
-                    boxShadow: 1,
-                    borderRadius: 2.5,
-                    display: "inline-flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    p: 1,
-                    m: 0.5,
-                    width: "48%",
-                  }}
-                >
-                  <Box sx={{ color: "text.secondary", width: "100%" }}>
-                    {stat.fieldName.toUpperCase()}
-                  </Box>
+        <Container
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+        >
+          {!loading &&
+            Object.keys(reportedStats).map((e, i) => {
+              const stat = reportedStats[i];
+              return (
+                <ThemeProvider theme={theme}>
                   <Box
                     sx={{
-                      color: "text.primary",
-                      width: "100%",
-                      fontSize: 25,
-                      fontWeight: "medium",
+                      bgcolor: "#429BEF",
+                      boxShadow: 1,
+                      borderRadius: 2.5,
+                      display: "inline-flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      p: 1,
+                      m: 0.5,
+                      width: "210px",
                     }}
                   >
-                    {stat.fieldValue}
+                    <Box sx={{ color: "text.secondary", width: "100%" }}>
+                      {stat.fieldName.toUpperCase()}
+                    </Box>
+                    <Box
+                      sx={{
+                        color: "text.primary",
+                        // width: "300px",
+                        fontSize: 15,
+                        fontWeight: "medium",
+                      }}
+                    >
+                      {stat.fieldValue}
+                    </Box>
                   </Box>
-                </Box>
-              </ThemeProvider>
-            );
-          })}
+                </ThemeProvider>
+              );
+            })}
+        </Container>
       </TabPanel>
     </>
   );

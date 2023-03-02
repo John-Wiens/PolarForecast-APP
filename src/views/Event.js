@@ -18,13 +18,11 @@
 // reactstrap components
 import { Card, CardHeader, Container, Row } from "reactstrap";
 
-import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
@@ -108,6 +106,16 @@ const Tables = () => {
     const statColumns = [];
 
     statColumns.push({
+      field: "id",
+      headerName: "",
+      filterable: false,
+      renderCell: (index) => index.api.getRowIndex(index.row.key) + 1,
+      disableExport: true,
+      GridColDef: "center",
+      flex: 0.1
+    });
+
+    statColumns.push({
       field: "key",
       headerName: "Team",
       filterable: false,
@@ -170,16 +178,26 @@ const Tables = () => {
   };
 
   const rankingsCallback = async (data) => {
+    data.data = data.data.filter((obj) => {
+      if (obj.key) {
+        return true;
+      }
+    });
 
-    data.data = data.data.filter((obj) => { if (obj.key) {return true}})
     for (const team of data?.data) {
-      if (team.key){ 
+      if (team.key) {
         team.key = team.key.replace("frc", "");
       }
-      console.log(team);
-      for (const [key,value] of Object.entries(team)){
-        if (typeof (value) === "number" && key.toLowerCase() !== "rank" && key !== "expectedRanking" && key.toLowerCase() !== "schedule"){
+      for (const [key, value] of Object.entries(team)) {
+        if (
+          typeof value === "number" &&
+          key.toLowerCase() !== "rank" &&
+          key !== "expectedRanking" &&
+          key.toLowerCase() !== "schedule"
+        ) {
           team[key] = team[key]?.toFixed(1);
+        } else {
+          team[key] = Number(team[key]);
         }
       }
     }
@@ -194,8 +212,8 @@ const Tables = () => {
     const qmData = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
-        for (const [key,value] of Object.entries(match)){
-          if (typeof (value) === "number" && key.toLowerCase() !== "match_number"){
+        for (const [key, value] of Object.entries(match)) {
+          if (typeof value === "number" && key.toLowerCase() !== "match_number") {
             match[key] = match[key]?.toFixed(1);
           }
         }
@@ -210,14 +228,13 @@ const Tables = () => {
 
   const searchKeysCallback = async (data) => {
     const url = new URL(window.location.href);
-    const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4]
+    const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4];
 
     for (let i = 0; i < data.data.length; i++) {
       if (data.data[i]?.key === eventName) {
-        setEventTitle(data.data[i]?.display)
+        setEventTitle(data.data[i]?.display);
       }
     }
-
   };
 
   useEffect(() => {
@@ -230,7 +247,6 @@ const Tables = () => {
     getRankings(year, eventKey, rankingsCallback);
     getMatchPredictions(year, eventKey, predictionsCallback);
     getSearchKeys(searchKeysCallback);
-
   }, []);
 
   function customToolbar() {
@@ -252,7 +268,6 @@ const Tables = () => {
         hidden={value !== index}
         id={`full-width-tabpanel-${index}`}
         aria-labelledby={`full-width-tab-${index}`}
-        // style={{width: "100%"}}
         {...other}
       >
         {value === index && (
@@ -292,14 +307,11 @@ const Tables = () => {
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-
       <TabPanel value={value} index={0} dir={darkTheme.direction}>
         <ThemeProvider theme={darkTheme}>
           <Container>
-            {/* Table */}
             <Row>
               <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                {/* Table */}
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
                     <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
@@ -322,8 +334,6 @@ const Tables = () => {
                         "& .MuiDataGrid-cell:hover": {
                           color: "white",
                         },
-
-                        // color: 'white',
                       }}
                     />
                   </div>
@@ -336,7 +346,6 @@ const Tables = () => {
       <TabPanel value={value} index={1} dir={darkTheme.direction}>
         <ThemeProvider theme={darkTheme}>
           <Container>
-            {/* Table */}
             <Row>
               <div className="col">
                 <Card className="bg-gradient-default shadow">
@@ -361,7 +370,6 @@ const Tables = () => {
                         "& .MuiDataGrid-cell:hover": {
                           color: "white",
                         },
-                        // color: 'white',
                       }}
                     />
                   </div>
