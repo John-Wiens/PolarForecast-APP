@@ -26,18 +26,22 @@ import Snowfall from "react-snowfall";
 
 const Selector = () => {
   const [type, setType] = React.useState("");
+  const [event, setEvent] = React.useState("");
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const urlType = url.pathname.split("/")[5].split("-")[0];
+    const path = url.pathname.split("/")
+    const urlType = path[5].split("-")[0];
     if (type !== urlType) {
       setType(urlType);
     }
+    console.log(path);
+    setEvent(path[4]);
   }, [window.location.href]);
 
   return (
     <>
-      <Header />
+      <Header/>
 
       {type === "team" && <Team />}
       {type === "match" && <Match />}
