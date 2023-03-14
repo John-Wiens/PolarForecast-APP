@@ -25,6 +25,8 @@ import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
+import CircularProgress from "@mui/material/CircularProgress";
+import Stack from '@mui/material/Stack';
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
@@ -32,10 +34,7 @@ import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 
 import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarExport,
+  DataGrid
 } from "@mui/x-data-grid";
 
 const theme = createTheme({
@@ -137,6 +136,7 @@ const Team = () => {
       }
     }
     setMatchesRows(rows);
+    setLoading(false);
   };
 
   const teamStatsCallback = async (data) => {
@@ -209,10 +209,13 @@ const Team = () => {
   }, []);
 
   useEffect(async () => {
-    await new Promise((r) => setTimeout(r, 250));
+    await new Promise((r) => setTimeout(r, 100));
     updateData(teamInfo, keys);
-    setLoading(false);
   }, [teamInfo, keys]);
+
+  // useEffect(() => {
+  //   updateData(teamInfo, keys);
+  // }, [teamInfo, keys]);
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -271,24 +274,43 @@ const Team = () => {
                       <h3 className="text-white mb-0">Team {teamNumber} Schedule</h3>
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
-                      <DataGrid
-                        disableColumnMenu
-                        rows={matchesRows}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        columns={columns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
-                        sx={{
-                          mx: 0.5,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
-                        }}
-                      />
+                      {!loading ? (
+                        <DataGrid
+                          disableColumnMenu
+                          rows={matchesRows}
+                          getRowId={(row) => {
+                            return row.key;
+                          }}
+                          columns={columns}
+                          pageSize={100}
+                          rowsPerPageOptions={[100]}
+                          sx={{
+                            mx: 0.5,
+                            border: 0,
+                            borderColor: "white",
+                            "& .MuiDataGrid-cell:hover": {
+                              color: "white",
+                            },
+                          }}
+                          components={{
+                            NoRowsOverlay: () => (
+                              <Stack height="100%" alignItems="center" justifyContent="center">
+                                No Match Data
+                              </Stack>
+                          )}}
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            minHeight: "calc(100vh - 290px)",
+                          }}
+                        >
+                          <CircularProgress />
+                        </Box>
+                      )}
                     </div>
                   </Card>
                 </div>
@@ -298,14 +320,8 @@ const Team = () => {
         </ThemeProvider>
       </TabPanel>
       <TabPanel value={value} index={1} dir={theme.direction}>
-        <Container
-          container
-          spacing={0}
-          direction="column"
-          alignItems="center"
-          justifyContent="center"
-        >
-          {!loading &&
+        <Container disableGutters maxWidth={false}>
+          {!loading ? (
             Object.keys(reportedStats).map((e, i) => {
               const stat = reportedStats[i];
               return (
@@ -320,7 +336,7 @@ const Team = () => {
                       justifyContent: "center",
                       p: 1,
                       m: 0.5,
-                      width: "210px",
+                      width: "180px",
                     }}
                   >
                     <Box sx={{ color: "text.secondary", width: "100%" }}>
@@ -339,7 +355,19 @@ const Team = () => {
                   </Box>
                 </ThemeProvider>
               );
-            })}
+            })
+          ) : (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "calc(100vh - 290px)",
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
         </Container>
       </TabPanel>
     </>

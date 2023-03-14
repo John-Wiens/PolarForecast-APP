@@ -33,10 +33,12 @@ import {
   GridToolbarExport,
 } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
+import Stack from '@mui/material/Stack';
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const darkTheme = createTheme({
   palette: {
@@ -224,6 +226,7 @@ const Tables = () => {
       return a.match_number - b.match_number;
     });
     setPredictions(qmData);
+    console.log(qmData)
   };
 
   const searchKeysCallback = async (data) => {
@@ -317,6 +320,7 @@ const Tables = () => {
                     <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                  {rankings.length > 0 ? (
                     <DataGrid
                       disableColumnMenu
                       rows={rankings}
@@ -326,7 +330,6 @@ const Tables = () => {
                       columns={statColumns}
                       pageSize={100}
                       rowsPerPageOptions={[100]}
-                      components={{ Toolbar: customToolbar }}
                       sx={{
                         mx: 0.5,
                         border: 0,
@@ -335,7 +338,27 @@ const Tables = () => {
                           color: "white",
                         },
                       }}
+                      components={[
+                        {Toolbar: customToolbar},
+                        {NoRowsOverlay: () => (
+                          <Stack height="100%" alignItems="center" justifyContent="center">
+                            No Match Data
+                          </Stack>
+                        )}
+                      ]}
                     />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          minHeight: "calc(100vh - 300px)",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    )}
                   </div>
                 </Card>
               </div>
@@ -353,7 +376,7 @@ const Tables = () => {
                     <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                    <DataGrid
+                  <DataGrid
                       disableColumnMenu
                       rows={predictions}
                       getRowId={(row) => {
@@ -371,6 +394,12 @@ const Tables = () => {
                           color: "white",
                         },
                       }}
+                      components={{
+                        NoRowsOverlay: () => (
+                          <Stack height="100%" alignItems="center" justifyContent="center">
+                            No Match Data
+                          </Stack>
+                      )}}
                     />
                   </div>
                 </Card>

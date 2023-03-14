@@ -19,19 +19,11 @@
 import { Card, CardHeader, Container, Row } from "reactstrap";
 
 // core components
-import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getMatchDetails } from "api.js";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarExport,
-} from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
-import Typography from "@mui/material/Typography";
+import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 
 const darkTheme = createTheme({
@@ -174,31 +166,31 @@ const Match = () => {
 
   return (
     <>
-      {!loading && (
-        <ThemeProvider theme={darkTheme}>
-          <div style={{ height: "calc(100vh + 25px)", width: "100%" }}>
-            <Container>
-              <Row>
-                <div style={{ width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h1 className="text-white mb-0">Match {data.prediction.match_number}</h1>
-                      <h3 className="text-white mb-0">
-                        BLUE {Math.round(data.prediction.blue_score)} POINTS - RED{" "}
-                        {Math.round(data.prediction.red_score)} POINTS
-                      </h3>
-                    </CardHeader>
-                  </Card>
-                </div>
-              </Row>
+      <ThemeProvider theme={darkTheme}>
+        <div style={{ height: "calc(100vh + 25px)", width: "100%" }}>
+          <Container>
+            <Row>
+              <div style={{ width: "100%" }}>
+                <Card className="bg-gradient-default shadow">
+                  <CardHeader className="bg-transparent">
+                    <h1 className="text-white mb-0">Match {data?.prediction?.match_number}</h1>
+                    <h3 className="text-white mb-0">
+                      BLUE {Math.round(data?.prediction?.blue_score)} POINTS - RED{" "}
+                      {Math.round(data?.prediction?.red_score)} POINTS
+                    </h3>
+                  </CardHeader>
+                </Card>
+              </div>
+            </Row>
 
-              <Row>
-                <div style={{ width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
-                    </CardHeader>
-                    <div style={{ height: "320px", width: "100%" }}>
+            <Row>
+              <div style={{ width: "100%" }}>
+                <Card className="bg-gradient-default shadow">
+                  <CardHeader className="bg-transparent">
+                    <h3 className="text-white mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
+                  </CardHeader>
+                  <div style={{ height: "320px", width: "100%" }}>
+                    {blueRows.length > 0 ? (
                       <DataGrid
                         disableColumnMenu
                         rows={blueRows}
@@ -217,39 +209,63 @@ const Match = () => {
                           },
                         }}
                       />
-                    </div>
-                  </Card>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Red Alliance {redWinner && " - Winner"}</h3>
-                    </CardHeader>
-                    <div style={{ height: "320px", width: "100%" }}>
-                      <DataGrid
-                        disableColumnMenu
-                        rows={redRows}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        columns={columns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
+                    ) : (
+                      <Box
                         sx={{
-                          mx: 0.5,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          minHeight: "320px",
                         }}
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </Row>
-            </Container>
-          </div>
-        </ThemeProvider>
-      )}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    )}
+                  </div>
+                </Card>
+                <Card className="bg-gradient-default shadow">
+                  <CardHeader className="bg-transparent">
+                    <h3 className="text-white mb-0">Red Alliance {redWinner && " - Winner"}</h3>
+                  </CardHeader>
+                  <div style={{ height: "320px", width: "100%" }}>
+                  {redRows.length > 0 ? (
+                    <DataGrid
+                      disableColumnMenu
+                      rows={redRows}
+                      getRowId={(row) => {
+                        return row.key;
+                      }}
+                      columns={columns}
+                      pageSize={100}
+                      rowsPerPageOptions={[100]}
+                      sx={{
+                        mx: 0.5,
+                        border: 0,
+                        borderColor: "white",
+                        "& .MuiDataGrid-cell:hover": {
+                          color: "white",
+                        },
+                      }}
+                    />
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          minHeight: "320px",
+                        }}
+                      >
+                        <CircularProgress />
+                      </Box>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </Row>
+          </Container>
+        </div>
+      </ThemeProvider>
     </>
   );
 };

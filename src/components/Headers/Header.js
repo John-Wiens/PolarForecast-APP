@@ -19,21 +19,49 @@
 // reactstrap components
 import picture from "../../assets/img/brand/PolarbearHead.png";
 import { Link } from "react-router-dom";
+import Button from '@mui/material/Button';
+import Grid from '@mui/material/Grid';
+import { styled } from '@mui/material/styles';
+import Paper from '@mui/material/Paper';
+import { IconButton } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 
 const Header = () => {
+
+  const Item = styled(Paper)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  }));
+
   return (
     <>
       <div
-        className="header bg-gradient-info pb-1 pt-4 pt-md-0"
         style={{
+          background:"linear-gradient(87deg, #11cdef 0, #1171ef 100%)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Link to="/data/index">
+        <Grid container spacing={3}>
+        <Grid item xs>
+
+        </Grid>
+        <Grid item xs={6} style={{textAlign: "center"}}>
+                  <Link to="/data/index">
           <img src={picture} alt={"logo"} />
         </Link>
+        </Grid>
+        <Grid item xs>
+          <Button>
+            SEARCH
+          </Button>
+        </Grid>
+      </Grid>
+
       </div>
     </>
   );
