@@ -101,9 +101,8 @@ const Tables = () => {
       renderCell: (params) => {
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           return (
-            <Typography fontWeight="bold" color="primary">
-              {" "}
-              <EmojiEventsIcon /> {params.value}{" "}
+            <Typography fontWeight="bold" color="#FF0000">
+              <EmojiEventsIcon /> {params.value}
             </Typography>
           );
         } else {

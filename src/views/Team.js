@@ -34,7 +34,7 @@ import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
-import MoodIcon from '@mui/icons-material/Mood';
+import MoodIcon from "@mui/icons-material/Mood";
 import { DataGrid } from "@mui/x-data-grid";
 
 const theme = createTheme({
@@ -168,51 +168,6 @@ const Team = () => {
   ]);
   const [matchesRows, setMatchesRows] = useState([]);
 
-  // const generateColumns = (fieldName, headerName) => {
-  //   const tempColumns = [];
-  //   const length = fieldName.length;
-  //   for (let i = 0; i < length; i++) {
-  //     let newColumn = {
-  //       field: "",
-  //       headerName: "",
-  //       filterable: false,
-  //       disableExport: true,
-  //       sortable: false,
-  //       headerAlign: "center",
-  //       align: "center",
-  //       flex: 0.5,
-  //       key: i,
-  //     };
-  //     newColumn.headerName = headerName[i];
-  //     newColumn.field = fieldName[i];
-  //     tempColumns.push(newColumn);
-
-  //     if (i === length - 1) {
-  //       tempColumns.push({
-  //         field: "info",
-  //         headerName: "Info",
-  //         filterable: false,
-  //         disableExport: true,
-  //         sortable: false,
-  //         headerAlign: "center",
-  //         align: "center",
-  //         flex: 0.5,
-  //         key: i + 1,
-  //         renderCell: (params) => {
-  //           const onClick = (e) => statisticsMatchOnClick(params.row);
-  //           return (
-  //             <IconButton onClick={onClick}>
-  //               <InfoIcon />{" "}
-  //             </IconButton>
-  //           );
-  //         },
-  //       });
-  //     }
-  //   }
-
-  //   return tempColumns;
-  // };
-
   const statisticsMatchOnClick = (cellValues) => {
     history.push("match-" + cellValues.key);
     // history.go(0)
@@ -317,10 +272,6 @@ const Team = () => {
     updateData(teamInfo, keys);
   }, [teamInfo, keys]);
 
-  // useEffect(() => {
-  //   updateData(teamInfo, keys);
-  // }, [teamInfo, keys]);
-
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
     return (
@@ -329,7 +280,6 @@ const Team = () => {
         hidden={value !== index}
         id={`full-width-tabpanel-${index}`}
         aria-labelledby={`full-width-tab-${index}`}
-        // style={{width: "100%"}}
         {...other}
       >
         {value === index && (
@@ -368,8 +318,8 @@ const Team = () => {
         </Tabs>
       </AppBar>
       <TabPanel value={value} index={0} dir={theme.direction}>
+      <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
         <ThemeProvider theme={theme}>
-          <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
             <Container>
               <Row>
                 <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
@@ -421,10 +371,11 @@ const Team = () => {
                 </div>
               </Row>
             </Container>
-          </div>
         </ThemeProvider>
+        </div>
       </TabPanel>
       <TabPanel value={value} index={1} dir={theme.direction}>
+      <div style={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}>
         <Container disableGutters maxWidth={false}>
           {!loading ? (
             Object.keys(reportedStats).map((e, i) => {
@@ -441,7 +392,7 @@ const Team = () => {
                       justifyContent: "center",
                       p: 1,
                       m: 0.5,
-                      width: "180px",
+                      width: "150px",
                     }}
                   >
                     <Box sx={{ color: "text.secondary", width: "100%" }}>
@@ -474,6 +425,7 @@ const Team = () => {
             </Box>
           )}
         </Container>
+        </div>
       </TabPanel>
     </>
   );

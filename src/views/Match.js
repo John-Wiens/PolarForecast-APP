@@ -24,6 +24,7 @@ import { getMatchDetails } from "api.js";
 import { DataGrid } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CircularProgress from "@mui/material/CircularProgress";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
 
 const darkTheme = createTheme({
@@ -187,7 +188,7 @@ const Match = () => {
               <div style={{ width: "100%" }}>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-blue mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
+                    <h3 style={{color:"#90caf9"}}>{blueWinner && <EmojiEventsIcon/>}Blue Alliance</h3>
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
                     {blueRows.length > 0 ? (
@@ -225,7 +226,7 @@ const Match = () => {
                 </Card>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-red mb-0">Red Alliance {redWinner && " - Winner"}</h3>
+                    <h3 style={{color:"#FF0000"}}>{redWinner && <EmojiEventsIcon/>}Red Alliance</h3>
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
                   {redRows.length > 0 ? (
