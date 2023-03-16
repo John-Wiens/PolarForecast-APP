@@ -17,6 +17,7 @@
 */
 // reactstrap components
 import { Card, CardHeader, Container, Row } from "reactstrap";
+import { alpha, styled } from '@mui/material/styles';
 
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
@@ -33,6 +34,7 @@ import {
   GridToolbarExport,
   GridColDef,
   GridCellParams,
+  gridClasses
 } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
 import Stack from "@mui/material/Stack";
@@ -49,6 +51,41 @@ const darkTheme = createTheme({
     mode: "dark",
   },
 });
+
+const ODD_OPACITY = 0.2;
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  [`& .${gridClasses.row}.even`]: {
+    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+    '&:hover, &.Mui-hovered': {
+      backgroundColor: alpha(theme.palette.secondary.main, ODD_OPACITY),
+      '@media (hover: none)': {
+        backgroundColor: 'transparent',
+      },
+    },
+    '&.Mui-selected': {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        ODD_OPACITY + theme.palette.action.selectedOpacity,
+      ),
+      '&:hover, &.Mui-hovered': {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          ODD_OPACITY +
+            theme.palette.action.selectedOpacity +
+            theme.palette.action.hoverOpacity,
+        ),
+        // Reset on touch devices, it doesn't add specificity
+        '@media (hover: none)': {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            ODD_OPACITY + theme.palette.action.selectedOpacity,
+          ),
+        },
+      },
+    },
+  },
+}));
 
 const Tables = () => {
   const history = useHistory();
@@ -206,8 +243,6 @@ const Tables = () => {
     history.push(eventKey + "/match-" + cellValues.key);
   };
 
-  const average = (array) => array.reduce((a, b) => a + b) / array.length;
-
   const rankingsCallback = async (data) => {
     data.data = data.data.filter((obj) => {
       if (obj.key) {
@@ -234,16 +269,6 @@ const Tables = () => {
         }
       }
     }
-    if (average(oprList) !== 0) {
-      data.data.sort(function (a, b) {
-        return a.OPR - b.OPR;
-      });
-      data.data.reverse();
-    } else {
-      data.data.sort(function (a, b) {
-        return a.key - b.key;
-      });
-    }
     setRankings(data.data);
   };
 
@@ -259,9 +284,6 @@ const Tables = () => {
         data_array.push(match);
       }
     }
-    data_array.sort(function (a, b) {
-      return a.match_number - b.match_number;
-    });
     setPredictions(data_array);
   };
 
@@ -271,7 +293,7 @@ const Tables = () => {
 
     for (let i = 0; i < data.data.length; i++) {
       if (data.data[i]?.key === eventName) {
-        setEventTitle(data.data[i]?.display);
+        setEventTitle(data.data[i]?.display.split("[")[0]);
       }
     }
   };
@@ -351,54 +373,61 @@ const Tables = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
-                  </CardHeader>
-                  <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                    {rankings.length > 0 ? (
-                      <DataGrid
-                        disableColumnMenu
-                        rows={rankings}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        columns={statColumns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
-                        sx={{
-                          mx: 0.5,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
-                        }}
-                        components={[
-                          { Toolbar: customToolbar },
-                          {
-                            NoRowsOverlay: () => (
+                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
+                    </CardHeader>
+                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                      {rankings.length > 0 ? (
+                        <StripedDataGrid
+                          initialState={{
+                            sorting: {
+                              sortModel: [{ field: 'OPR', sort: 'desc' }],
+                            },
+                          }}
+                          disableColumnMenu
+                          rows={rankings}
+                          getRowId={(row) => {
+                            return row.key;
+                          }}
+                          columns={statColumns}
+                          pageSize={100}
+                          rowsPerPageOptions={[100]}
+                          components={{
+                              Toolbar: customToolbar,
+                              NoRowsOverlay: () => (
                               <Stack height="100%" alignItems="center" justifyContent="center">
                                 No Match Data
-                              </Stack>
-                            ),
-                          },
-                        ]}
-                      />
-                    ) : (
-                      <Box
-                        sx={{
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          minHeight: "calc(100vh - 300px)",
-                        }}
-                      >
-                        <CircularProgress />
-                      </Box>
-                    )}
-                  </div>
-                </Card>
+                              </Stack>)
+                          }}
+                          sx={{
+                            mx: 0.5,
+                            border: 0,
+                            borderColor: "white",
+                            "& .MuiDataGrid-cell:hover": {
+                              color: "white",
+                            },
+                          }}
+                          getRowClassName={(params) =>
+                            params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+                          }
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            minHeight: "calc(100vh - 300px)",
+                          }}
+                        >
+                          <CircularProgress />
+                        </Box>
+                      )}
+                    </div>
+                  </Card>
+                </div>
               </Row>
             </Container>
           </ThemeProvider>
@@ -414,6 +443,11 @@ const Tables = () => {
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                       <DataGrid
+                        initialState={{
+                          sorting: {
+                            sortModel: [{ field: 'match_number', sort: 'asc' }],
+                          },
+                        }}
                         disableColumnMenu
                         rows={predictions}
                         getRowId={(row) => {

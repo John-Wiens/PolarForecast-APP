@@ -22,10 +22,8 @@ function getWithExpiry(key) {
   const now = new Date();
   // compare the expiry time of the item with the current time
   if (now.getTime() > item.expiry) {
-    // If the item is expired, delete the item from storage
-    // and return null
-    console.log("removed item " + key);
-    localStorage.removeItem(key);
+    console.log("Clearing Local Storage");
+    localStorage.clear();
     return null;
   }
   return JSON.parse(item.value);
@@ -41,7 +39,7 @@ export const getStatDescription = async (year, event, callback) => {
       const response = await fetch(endpoint);
       if (response.ok) {
         const data = await response.json();
-        setWithExpiry(storage_name, data, 120);
+        setWithExpiry(storage_name, data, default_ttl);
         callback(data);
       } else {
         callback({ data: [] });
@@ -136,7 +134,7 @@ export const getSearchKeys = async (callback) => {
       const response = await fetch(endpoint);
       if (response.ok) {
         const data = await response.json();
-        setWithExpiry("search_keys", data, 10);
+        setWithExpiry("search_keys", data, default_ttl);
         callback(data);
       } else {
         callback({ data: [] });
