@@ -31,14 +31,18 @@ import {
   GridToolbarContainer,
   GridToolbarColumnsButton,
   GridToolbarExport,
+  GridColDef,
+  GridCellParams,
 } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
-import Stack from '@mui/material/Stack';
+import Stack from "@mui/material/Stack";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import "../assets/css/polar-css.css";
 
 const darkTheme = createTheme({
   palette: {
@@ -73,6 +77,18 @@ const Tables = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
+          return (
+            <Typography fontWeight="bold" color="primary">
+              {" "}
+              <EmojiEventsIcon /> {params.value}{" "}
+            </Typography>
+          );
+        } else {
+          return <Typography color="#FFFFFF"> {params.value}</Typography>;
+        }
+      },
     },
     {
       field: "red_score",
@@ -82,6 +98,18 @@ const Tables = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
+          return (
+            <Typography fontWeight="bold" color="primary">
+              {" "}
+              <EmojiEventsIcon /> {params.value}{" "}
+            </Typography>
+          );
+        } else {
+          return <Typography color="#FFFFFF"> {params.value}</Typography>;
+        }
+      },
     },
     {
       field: "Info",
@@ -114,7 +142,7 @@ const Tables = () => {
       renderCell: (index) => index.api.getRowIndex(index.row.key) + 1,
       disableExport: true,
       GridColDef: "center",
-      flex: 0.1
+      flex: 0.1,
     });
 
     statColumns.push({
@@ -179,17 +207,21 @@ const Tables = () => {
     history.push(eventKey + "/match-" + cellValues.key);
   };
 
+  const average = (array) => array.reduce((a, b) => a + b) / array.length;
+
   const rankingsCallback = async (data) => {
     data.data = data.data.filter((obj) => {
       if (obj.key) {
         return true;
       }
     });
+    let oprList = [];
 
     for (const team of data?.data) {
       if (team.key) {
         team.key = team.key.replace("frc", "");
       }
+      oprList.push(team.OPR);
       for (const [key, value] of Object.entries(team)) {
         if (
           typeof value === "number" &&
@@ -203,15 +235,21 @@ const Tables = () => {
         }
       }
     }
-    data.data.sort(function (a, b) {
-      return a.OPR - b.OPR;
-    });
-    data.data.reverse();
+    if (average(oprList) !== 0) {
+      data.data.sort(function (a, b) {
+        return a.OPR - b.OPR;
+      });
+      data.data.reverse();
+    } else {
+      data.data.sort(function (a, b) {
+        return a.key - b.key;
+      });
+    }
     setRankings(data.data);
   };
 
   const predictionsCallback = async (data) => {
-    const qmData = [];
+    const data_array = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
@@ -219,14 +257,13 @@ const Tables = () => {
             match[key] = match[key]?.toFixed(1);
           }
         }
-        qmData.push(match);
+        data_array.push(match);
       }
     }
-    qmData.sort(function (a, b) {
+    data_array.sort(function (a, b) {
       return a.match_number - b.match_number;
     });
-    setPredictions(qmData);
-    console.log(qmData)
+    setPredictions(data_array);
   };
 
   const searchKeysCallback = async (data) => {
@@ -310,43 +347,45 @@ const Tables = () => {
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0} dir={darkTheme.direction}>
-        <ThemeProvider theme={darkTheme}>
-          <Container>
-            <Row>
-              <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+      <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
+        <TabPanel value={value} index={0} dir={darkTheme.direction}>
+          <ThemeProvider theme={darkTheme}>
+            <Container>
+              <Row>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
                     <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
                   </CardHeader>
                   <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  {rankings.length > 0 ? (
-                    <DataGrid
-                      disableColumnMenu
-                      rows={rankings}
-                      getRowId={(row) => {
-                        return row.key;
-                      }}
-                      columns={statColumns}
-                      pageSize={100}
-                      rowsPerPageOptions={[100]}
-                      sx={{
-                        mx: 0.5,
-                        border: 0,
-                        borderColor: "white",
-                        "& .MuiDataGrid-cell:hover": {
-                          color: "white",
-                        },
-                      }}
-                      components={[
-                        {Toolbar: customToolbar},
-                        {NoRowsOverlay: () => (
-                          <Stack height="100%" alignItems="center" justifyContent="center">
-                            No Match Data
-                          </Stack>
-                        )}
-                      ]}
-                    />
+                    {rankings.length > 0 ? (
+                      <DataGrid
+                        disableColumnMenu
+                        rows={rankings}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={statColumns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        sx={{
+                          mx: 0.5,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                        components={[
+                          { Toolbar: customToolbar },
+                          {
+                            NoRowsOverlay: () => (
+                              <Stack height="100%" alignItems="center" justifyContent="center">
+                                No Match Data
+                              </Stack>
+                            ),
+                          },
+                        ]}
+                      />
                     ) : (
                       <Box
                         sx={{
@@ -361,53 +400,54 @@ const Tables = () => {
                     )}
                   </div>
                 </Card>
-              </div>
-            </Row>
-          </Container>
-        </ThemeProvider>
-      </TabPanel>
-      <TabPanel value={value} index={1} dir={darkTheme.direction}>
-        <ThemeProvider theme={darkTheme}>
-          <Container>
-            <Row>
-              <div className="col">
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
-                  </CardHeader>
-                  <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <DataGrid
-                      disableColumnMenu
-                      rows={predictions}
-                      getRowId={(row) => {
-                        return row.key;
-                      }}
-                      columns={matchPredictionColumns}
-                      pageSize={100}
-                      rowsPerPageOptions={[100]}
-                      disableExtendRowFullWidth={true}
-                      sx={{
-                        boxShadow: 2,
-                        border: 0,
-                        borderColor: "white",
-                        "& .MuiDataGrid-cell:hover": {
-                          color: "white",
-                        },
-                      }}
-                      components={{
-                        NoRowsOverlay: () => (
-                          <Stack height="100%" alignItems="center" justifyContent="center">
-                            No Match Data
-                          </Stack>
-                      )}}
-                    />
-                  </div>
-                </Card>
-              </div>
-            </Row>
-          </Container>
-        </ThemeProvider>
-      </TabPanel>
+              </Row>
+            </Container>
+          </ThemeProvider>
+        </TabPanel>
+        <TabPanel value={value} index={1} dir={darkTheme.direction}>
+          <ThemeProvider theme={darkTheme}>
+            <Container>
+              <Row>
+                <div className="col">
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
+                    </CardHeader>
+                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                      <DataGrid
+                        disableColumnMenu
+                        rows={predictions}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={matchPredictionColumns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        disableExtendRowFullWidth={true}
+                        sx={{
+                          boxShadow: 2,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                        components={{
+                          NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                              No Match Data
+                            </Stack>
+                          ),
+                        }}
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </Row>
+            </Container>
+          </ThemeProvider>
+        </TabPanel>
+      </div>
       <Snowfall
         snowflakeCount={50}
         style={{

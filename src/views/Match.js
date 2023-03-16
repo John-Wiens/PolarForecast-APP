@@ -99,7 +99,7 @@ const Match = () => {
     }
     newRow = {
       key: 4,
-      team: "Alliance",
+      team: "Sum",
       auto_score: blueAutoScore?.toFixed(1),
       auto_charge_station: blueChargeStation?.toFixed(1),
       teleop_score: blueTeleop?.toFixed(1),
@@ -131,7 +131,7 @@ const Match = () => {
     }
     newRow = {
       key: 4,
-      team: "Alliance",
+      team: "Sum",
       auto_score: redAutoScore?.toFixed(1),
       auto_charge_station: redChargeStation?.toFixed(1),
       teleop_score: redTeleop?.toFixed(1),
@@ -167,7 +167,7 @@ const Match = () => {
   return (
     <>
       <ThemeProvider theme={darkTheme}>
-        <div style={{ height: "calc(100vh + 25px)", width: "100%" }}>
+        <div style={{ height: "calc(100vh - 132px)", width: "100%", overflow: "auto" }}>
           <Container>
             <Row>
               <div style={{ width: "100%" }}>
@@ -187,7 +187,7 @@ const Match = () => {
               <div style={{ width: "100%" }}>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
+                    <h3 className="text-blue mb-0">Blue Alliance {blueWinner && " - Winner"}</h3>
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
                     {blueRows.length > 0 ? (
@@ -225,7 +225,7 @@ const Match = () => {
                 </Card>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 className="text-white mb-0">Red Alliance {redWinner && " - Winner"}</h3>
+                    <h3 className="text-red mb-0">Red Alliance {redWinner && " - Winner"}</h3>
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
                   {redRows.length > 0 ? (

@@ -26,16 +26,16 @@ import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
-import Stack from '@mui/material/Stack';
+import Stack from "@mui/material/Stack";
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import InfoIcon from "@mui/icons-material/Info";
 import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
-
-import {
-  DataGrid
-} from "@mui/x-data-grid";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import MoodBadIcon from "@mui/icons-material/MoodBad";
+import MoodIcon from '@mui/icons-material/Mood';
+import { DataGrid } from "@mui/x-data-grid";
 
 const theme = createTheme({
   palette: {
@@ -55,53 +55,163 @@ const Team = () => {
   const [value, setValue] = React.useState(0);
   const [teamNumber, setTeamNumber] = useState();
 
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState([
+    {
+      field: "match_number",
+      headerName: "Match",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
+      field: "alliance_color",
+      headerName: "Color",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      renderCell: (params) => {
+        if (params.value.toLowerCase() === "red") {
+          return (
+            <Typography fontWeight="bold" color="#FF0000">
+              {params.value}
+            </Typography>
+          );
+        } else {
+          return (
+            <Typography fontWeight="bold" color="primary">
+              {params.value}
+            </Typography>
+          );
+        }
+      },
+    },
+    {
+      field: "blue_score",
+      headerName: "Blue Score",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      renderCell: (params) => {
+        if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
+          console.log(params.row.color);
+          if (params.row.alliance_color.toLowerCase() === "blue") {
+            return (
+              <Typography fontWeight="bold" color="primary">
+                <EmojiEventsIcon /> {params.value}
+              </Typography>
+            );
+          } else {
+            return (
+              <Typography fontWeight="bold" color="primary">
+                {" "}
+                <MoodBadIcon /> {params.value}{" "}
+              </Typography>
+            );
+          }
+        } else {
+          return <Typography color="#FFFFFF"> {params.value}</Typography>;
+        }
+      },
+    },
+    {
+      field: "red_score",
+      headerName: "Red Score",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      renderCell: (params) => {
+        if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
+          if (params.row.alliance_color.toLowerCase() === "red") {
+            return (
+              <Typography fontWeight="bold" color="#FF0000">
+                <EmojiEventsIcon /> {params.value}
+              </Typography>
+            );
+          } else {
+            return (
+              <Typography fontWeight="bold" color="#FF0000">
+                {" "}
+                <MoodBadIcon /> {params.value}{" "}
+              </Typography>
+            );
+          }
+        } else {
+          return <Typography color="#FFFFFF"> {params.value}</Typography>;
+        }
+      },
+    },
+    {
+      field: "Info",
+      headerName: "Info",
+      sortable: false,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      minWidth: 70,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsMatchOnClick(params.row);
+        return (
+          <IconButton onClick={onClick}>
+            <InfoIcon />{" "}
+          </IconButton>
+        );
+      },
+    },
+  ]);
   const [matchesRows, setMatchesRows] = useState([]);
 
-  const generateColumns = (fieldName, headerName) => {
-    const tempColumns = [];
-    const length = fieldName.length;
-    for (let i = 0; i < length; i++) {
-      let newColumn = {
-        field: "",
-        headerName: "",
-        filterable: false,
-        disableExport: true,
-        sortable: false,
-        headerAlign: "center",
-        align: "center",
-        flex: 0.5,
-        key: i,
-      };
-      newColumn.headerName = headerName[i];
-      newColumn.field = fieldName[i];
-      tempColumns.push(newColumn);
+  // const generateColumns = (fieldName, headerName) => {
+  //   const tempColumns = [];
+  //   const length = fieldName.length;
+  //   for (let i = 0; i < length; i++) {
+  //     let newColumn = {
+  //       field: "",
+  //       headerName: "",
+  //       filterable: false,
+  //       disableExport: true,
+  //       sortable: false,
+  //       headerAlign: "center",
+  //       align: "center",
+  //       flex: 0.5,
+  //       key: i,
+  //     };
+  //     newColumn.headerName = headerName[i];
+  //     newColumn.field = fieldName[i];
+  //     tempColumns.push(newColumn);
 
-      if (i === length - 1) {
-        tempColumns.push({
-          field: "info",
-          headerName: "Info",
-          filterable: false,
-          disableExport: true,
-          sortable: false,
-          headerAlign: "center",
-          align: "center",
-          flex: 0.5,
-          key: i + 1,
-          renderCell: (params) => {
-            const onClick = (e) => statisticsMatchOnClick(params.row);
-            return (
-              <IconButton onClick={onClick}>
-                <InfoIcon />{" "}
-              </IconButton>
-            );
-          },
-        });
-      }
-    }
+  //     if (i === length - 1) {
+  //       tempColumns.push({
+  //         field: "info",
+  //         headerName: "Info",
+  //         filterable: false,
+  //         disableExport: true,
+  //         sortable: false,
+  //         headerAlign: "center",
+  //         align: "center",
+  //         flex: 0.5,
+  //         key: i + 1,
+  //         renderCell: (params) => {
+  //           const onClick = (e) => statisticsMatchOnClick(params.row);
+  //           return (
+  //             <IconButton onClick={onClick}>
+  //               <InfoIcon />{" "}
+  //             </IconButton>
+  //           );
+  //         },
+  //       });
+  //     }
+  //   }
 
-    return tempColumns;
-  };
+  //   return tempColumns;
+  // };
 
   const statisticsMatchOnClick = (cellValues) => {
     history.push("match-" + cellValues.key);
@@ -196,12 +306,6 @@ const Team = () => {
     const team = params[5].replace("team-", "");
     setTeamNumber(team);
 
-    setColumns(
-      generateColumns(
-        ["match_number", "alliance_color", "blue_score", "red_score"],
-        ["Match", "Color", "Blue Score", "Red Score"]
-      )
-    );
     getTeamMatchPredictions(year, eventKey, "frc" + team, teamPredictionsCallback);
 
     getStatDescription(year, eventKey, statDescriptionCallback);
@@ -297,7 +401,8 @@ const Team = () => {
                               <Stack height="100%" alignItems="center" justifyContent="center">
                                 No Match Data
                               </Stack>
-                          )}}
+                            ),
+                          }}
                         />
                       ) : (
                         <Box
