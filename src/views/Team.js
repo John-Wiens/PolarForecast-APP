@@ -15,10 +15,8 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-// reactstrap components
 import { Card, CardHeader, Container, Row } from "reactstrap";
-
-// core components
+import { alpha, styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -34,14 +32,7 @@ import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
-import MoodIcon from "@mui/icons-material/Mood";
-import { DataGrid } from "@mui/x-data-grid";
-
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
+import { DataGrid, gridClasses } from "@mui/x-data-grid";
 
 const Team = () => {
   const history = useHistory();
@@ -99,7 +90,6 @@ const Team = () => {
       flex: 0.5,
       renderCell: (params) => {
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
-          console.log(params.row.color);
           if (params.row.alliance_color.toLowerCase() === "blue") {
             return (
               <Typography fontWeight="bold" color="primary">
@@ -170,7 +160,6 @@ const Team = () => {
 
   const statisticsMatchOnClick = (cellValues) => {
     history.push("match-" + cellValues.key);
-    // history.go(0)
   };
 
   const teamPredictionsCallback = async (data) => {
@@ -178,11 +167,6 @@ const Team = () => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
     const team = params[5].replace("team-", "frc");
-
-    data.data.sort(function (a, b) {
-      return a.match_number - b.match_number;
-    });
-
     for (let i = 0; i < data.data.length; i++) {
       if (data.data[i].comp_level === "qm") {
         let color = "UNKOWN";
@@ -317,9 +301,9 @@ const Team = () => {
           <Tab label="Team Stats" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0} dir={theme.direction}>
-      <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
-        <ThemeProvider theme={theme}>
+      <TabPanel value={value} index={0} dir={darkTheme.direction}>
+        <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
+          <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
                 <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
@@ -329,7 +313,12 @@ const Team = () => {
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
                       {!loading ? (
-                        <DataGrid
+                        <StripedDataGrid
+                          initialState={{
+                            sorting: {
+                              sortModel: [{ field: "match_number", sort: "asc" }],
+                            },
+                          }}
                           disableColumnMenu
                           rows={matchesRows}
                           getRowId={(row) => {
@@ -353,6 +342,9 @@ const Team = () => {
                               </Stack>
                             ),
                           }}
+                          getRowClassName={(params) =>
+                            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                          }
                         />
                       ) : (
                         <Box
@@ -371,64 +363,103 @@ const Team = () => {
                 </div>
               </Row>
             </Container>
-        </ThemeProvider>
+          </ThemeProvider>
         </div>
       </TabPanel>
-      <TabPanel value={value} index={1} dir={theme.direction}>
-      <div style={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}>
-        <Container disableGutters maxWidth={false}>
-          {!loading ? (
-            Object.keys(reportedStats).map((e, i) => {
-              const stat = reportedStats[i];
-              return (
-                <ThemeProvider theme={theme}>
-                  <Box
-                    sx={{
-                      bgcolor: "#429BEF",
-                      boxShadow: 1,
-                      borderRadius: 2.5,
-                      display: "inline-flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      p: 1,
-                      m: 0.5,
-                      width: "150px",
-                    }}
-                  >
-                    <Box sx={{ color: "text.secondary", width: "100%" }}>
-                      {stat.fieldName.toUpperCase()}
-                    </Box>
+      <TabPanel value={value} index={1} dir={darkTheme.direction}>
+        <div style={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}>
+          <Container>
+            {!loading ? (
+              Object.keys(reportedStats).map((e, i) => {
+                const stat = reportedStats[i];
+                return (
+                  <ThemeProvider theme={darkTheme}>
                     <Box
                       sx={{
-                        color: "text.primary",
-                        // width: "300px",
-                        fontSize: 15,
-                        fontWeight: "medium",
+                        bgcolor: "#429BEF",
+                        boxShadow: 1,
+                        borderRadius: 2.5,
+                        display: "inline-flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        p: 1,
+                        m: 0.5,
+                        width: "150px",
                       }}
                     >
-                      {stat.fieldValue}
+                      <Box sx={{ color: "text.secondary", width: "100%" }}>
+                        {stat.fieldName.toUpperCase()}
+                      </Box>
+                      <Box
+                        sx={{
+                          color: "text.primary",
+                          // width: "300px",
+                          fontSize: 15,
+                          fontWeight: "medium",
+                        }}
+                      >
+                        {stat.fieldValue}
+                      </Box>
                     </Box>
-                  </Box>
-                </ThemeProvider>
-              );
-            })
-          ) : (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minHeight: "calc(100vh - 290px)",
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          )}
-        </Container>
+                  </ThemeProvider>
+                );
+              })
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  minHeight: "calc(100vh - 290px)",
+                }}
+              >
+                <CircularProgress />
+              </Box>
+            )}
+          </Container>
         </div>
       </TabPanel>
     </>
   );
 };
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
+
+const ODD_OPACITY = 0.2;
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  [`& .${gridClasses.row}.even`]: {
+    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+    "&:hover, &.Mui-hovered": {
+      backgroundColor: alpha("#78829c", ODD_OPACITY),
+      "@media (hover: none)": {
+        backgroundColor: "transparent",
+      },
+    },
+    "&.Mui-selected": {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        ODD_OPACITY + theme.palette.action.selectedOpacity
+      ),
+      "&:hover, &.Mui-hovered": {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
+        ),
+        // Reset on touch devices, it doesn't add specificity
+        "@media (hover: none)": {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            ODD_OPACITY + theme.palette.action.selectedOpacity
+          ),
+        },
+      },
+    },
+  },
+}));
 
 export default Team;

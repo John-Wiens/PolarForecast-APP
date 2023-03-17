@@ -15,23 +15,15 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-// reactstrap components
 import { Card, CardHeader, Container, Row } from "reactstrap";
-
-// core components
+import { alpha, styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { getMatchDetails } from "api.js";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
 
 const generateColumns = (fieldName, headerName) => {
   const tempColumns = [];
@@ -67,7 +59,12 @@ const Match = () => {
   const [loading, setLoading] = useState(true);
 
   const [data, setData] = useState([]);
-
+  const [matchTitle, setMatchTitle] = useState(false);
+  const [bluePrediction, setBluePrediction] = useState(false);
+  const [blueResult, setBlueResult] = useState(false);
+  const [redPrediction, setRedPrediction] = useState(false);
+  const [redResult, setRedResult] = useState(false);
+  const [redTitle, setRedTitle] = useState(false);
   const [columns, setColumns] = useState([]);
   const [blueRows, setBlueRows] = useState([]);
   const [redRows, setRedRows] = useState([]);
@@ -77,7 +74,6 @@ const Match = () => {
   const matchInfoCallback = async (restData) => {
     setData(restData);
     let newRow = {};
-
     const blueAutoRows = [];
     let i = 0;
     let blueAutoScore = 0;
@@ -100,7 +96,7 @@ const Match = () => {
     }
     newRow = {
       key: 4,
-      team: "Sum",
+      team: "",
       auto_score: blueAutoScore?.toFixed(1),
       auto_charge_station: blueChargeStation?.toFixed(1),
       teleop_score: blueTeleop?.toFixed(1),
@@ -132,7 +128,7 @@ const Match = () => {
     }
     newRow = {
       key: 4,
-      team: "Sum",
+      team: "",
       auto_score: redAutoScore?.toFixed(1),
       auto_charge_station: redChargeStation?.toFixed(1),
       teleop_score: redTeleop?.toFixed(1),
@@ -146,6 +142,30 @@ const Match = () => {
     } else if (restData?.match.winning_alliance === "blue") {
       setBlueWinner(true);
     }
+
+    let date = new Date();
+    if (restData?.match["actual_time"]) {
+      date = new Date(restData?.match.actual_time * 1000);
+      setBlueResult(`${Math.round(restData?.match.score_breakdown.blue.totalPoints)} Points,  
+      ${Math.round(restData?.match.score_breakdown.blue.rp)} RPs`);
+      setRedResult(`${Math.round(restData?.match.score_breakdown.red.totalPoints)} Points,  
+      ${Math.round(restData?.match.score_breakdown.red.rp)} RPs`);
+    } else {
+      date = new Date(restData?.match.predicted_time * 1000);
+    }
+    const timeOfDay = date.toLocaleTimeString([], { hour: "numeric", minute: "numeric" });
+    setMatchTitle(restData?.prediction?.match_number + " - " + timeOfDay);
+    setBluePrediction(`${Math.round(restData?.prediction?.blue_score)} Points,  
+      ${Math.round(restData?.prediction?.blue_win_rp)} RPs`);
+    setRedPrediction(`${Math.round(restData?.prediction?.red_score)} Points,  
+      ${Math.round(restData?.prediction?.red_win_rp)} RPs`);
+    setRedTitle(
+      ": " +
+        String(Math.round(restData?.prediction?.red_score)) +
+        " Points, " +
+        String(Math.round(restData?.prediction?.red_win_rp)) +
+        " RPs"
+    );
 
     setLoading(false);
   };
@@ -174,11 +194,9 @@ const Match = () => {
               <div style={{ width: "100%" }}>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h1 className="text-white mb-0">Match {data?.prediction?.match_number}</h1>
-                    <h3 className="text-white mb-0">
-                      BLUE {Math.round(data?.prediction?.blue_score)} POINTS - RED{" "}
-                      {Math.round(data?.prediction?.red_score)} POINTS
-                    </h3>
+                    <h1 className="text-white mb-0">Match {matchTitle}</h1>
+                    {/* <h3 className="text-white mb-0">Prediction: {matchPrediction}</h3>
+                    {matchResult && <h3 className="text-white mb-0">Result: {matchResult}</h3>} */}
                   </CardHeader>
                 </Card>
               </div>
@@ -188,11 +206,15 @@ const Match = () => {
               <div style={{ width: "100%" }}>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 style={{color:"#90caf9"}}>{blueWinner && <EmojiEventsIcon/>}Blue Alliance</h3>
+                    <h3 style={{ color: "#90caf9" }}>
+                      {blueWinner && <EmojiEventsIcon />}Blue Alliance
+                    </h3>
+                    <h4 className="text-white mb-0">Prediction: {bluePrediction}</h4>
+                    {blueResult && <h4 className="text-white mb-0">Result: {blueResult}</h4>}
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
                     {blueRows.length > 0 ? (
-                      <DataGrid
+                      <StripedDataGrid
                         disableColumnMenu
                         rows={blueRows}
                         getRowId={(row) => {
@@ -209,6 +231,9 @@ const Match = () => {
                             color: "white",
                           },
                         }}
+                        getRowClassName={(params) =>
+                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                        }
                       />
                     ) : (
                       <Box
@@ -226,28 +251,35 @@ const Match = () => {
                 </Card>
                 <Card className="bg-gradient-default shadow">
                   <CardHeader className="bg-transparent">
-                    <h3 style={{color:"#FF0000"}}>{redWinner && <EmojiEventsIcon/>}Red Alliance</h3>
+                    <h3 style={{ color: "#FF0000" }}>
+                      {redWinner && <EmojiEventsIcon />}Red Alliance
+                    </h3>
+                    <h4 className="text-white mb-0">Prediction: {redPrediction}</h4>
+                    {redResult && <h4 className="text-white mb-0">Result: {redResult}</h4>}
                   </CardHeader>
                   <div style={{ height: "320px", width: "100%" }}>
-                  {redRows.length > 0 ? (
-                    <DataGrid
-                      disableColumnMenu
-                      rows={redRows}
-                      getRowId={(row) => {
-                        return row.key;
-                      }}
-                      columns={columns}
-                      pageSize={100}
-                      rowsPerPageOptions={[100]}
-                      sx={{
-                        mx: 0.5,
-                        border: 0,
-                        borderColor: "white",
-                        "& .MuiDataGrid-cell:hover": {
-                          color: "white",
-                        },
-                      }}
-                    />
+                    {redRows.length > 0 ? (
+                      <StripedDataGrid
+                        disableColumnMenu
+                        rows={redRows}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={columns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        sx={{
+                          mx: 0.5,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                        getRowClassName={(params) =>
+                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                        }
+                      />
                     ) : (
                       <Box
                         sx={{
@@ -270,5 +302,44 @@ const Match = () => {
     </>
   );
 };
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
+
+const ODD_OPACITY = 0.2;
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  [`& .${gridClasses.row}.even`]: {
+    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+    "&:hover, &.Mui-hovered": {
+      backgroundColor: alpha("#78829c", ODD_OPACITY),
+      "@media (hover: none)": {
+        backgroundColor: "transparent",
+      },
+    },
+    "&.Mui-selected": {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        ODD_OPACITY + theme.palette.action.selectedOpacity
+      ),
+      "&:hover, &.Mui-hovered": {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
+        ),
+        // Reset on touch devices, it doesn't add specificity
+        "@media (hover: none)": {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            ODD_OPACITY + theme.palette.action.selectedOpacity
+          ),
+        },
+      },
+    },
+  },
+}));
 
 export default Match;

@@ -79,7 +79,7 @@ export const getTeamStatDescription = async (year, event, team, callback) => {
 
 export const getRankings = async (year, event, callback) => {
   try {
-    const storage_name = year + event + "rankings";
+    const storage_name = year + event + "_rankings";
     const data = getWithExpiry(storage_name);
     if (data === null) {
       const endpoint = `${API_ENDPOINT}/${year}/${event}/stats`;
@@ -103,7 +103,7 @@ export const getRankings = async (year, event, callback) => {
 
 export const getMatchPredictions = async (year, event, callback) => {
   try {
-    const storage_name = year + event + "_match_details";
+    const storage_name = year + event + "_predictions";
     const data = getWithExpiry(storage_name);
     if (data === null) {
       const endpoint = `${API_ENDPOINT}/${year}/${event}/predictions`;

@@ -10,3 +10,7 @@
 .polar-content {
     text-align: center; /* center the text */
 }
+
+.svg_icons {
+  transform: scale(1.5);
+}

@@ -15,10 +15,8 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-// reactstrap components
 import { Card, CardHeader, Container, Row } from "reactstrap";
-import { alpha, styled } from '@mui/material/styles';
-
+import { alpha, styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -32,9 +30,7 @@ import {
   GridToolbarContainer,
   GridToolbarColumnsButton,
   GridToolbarExport,
-  GridColDef,
-  GridCellParams,
-  gridClasses
+  gridClasses,
 } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
 import Stack from "@mui/material/Stack";
@@ -46,54 +42,14 @@ import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import "../assets/css/polar-css.css";
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
-const ODD_OPACITY = 0.2;
-
-const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
-  [`& .${gridClasses.row}.even`]: {
-    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
-    '&:hover, &.Mui-hovered': {
-      backgroundColor: alpha(theme.palette.secondary.main, ODD_OPACITY),
-      '@media (hover: none)': {
-        backgroundColor: 'transparent',
-      },
-    },
-    '&.Mui-selected': {
-      backgroundColor: alpha(
-        theme.palette.primary.main,
-        ODD_OPACITY + theme.palette.action.selectedOpacity,
-      ),
-      '&:hover, &.Mui-hovered': {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          ODD_OPACITY +
-            theme.palette.action.selectedOpacity +
-            theme.palette.action.hoverOpacity,
-        ),
-        // Reset on touch devices, it doesn't add specificity
-        '@media (hover: none)': {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            ODD_OPACITY + theme.palette.action.selectedOpacity,
-          ),
-        },
-      },
-    },
-  },
-}));
-
 const Tables = () => {
   const history = useHistory();
 
   const [statDescription, setStatDescription] = useState([]);
   const [eventTitle, setEventTitle] = useState("");
   const [rankings, setRankings] = useState([]);
-  const [predictions, setPredictions] = useState([]);
+  const [qualPredictions, setQualPredictions] = useState([]);
+  const [elimPredictions, setElimPredictions] = useState([]);
   const [showKeys, setShowKeys] = useState([]);
   const [statColumns, setStatColumns] = useState([]);
   const [matchPredictionColumns, setMatchPredictionColumns] = useState([
@@ -225,7 +181,6 @@ const Tables = () => {
         );
       },
     });
-
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
@@ -273,7 +228,9 @@ const Tables = () => {
   };
 
   const predictionsCallback = async (data) => {
-    const data_array = [];
+    const quals_array = [];
+    const sf_elims_array = [];
+    const f_elims_array = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
@@ -281,10 +238,37 @@ const Tables = () => {
             match[key] = match[key]?.toFixed(1);
           }
         }
-        data_array.push(match);
+        quals_array.push(match);
+      } else if (match.comp_level === "sf") {
+        for (const [key, value] of Object.entries(match)) {
+          if (typeof value === "number" && key.toLowerCase() !== "match_number") {
+            match[key] = match[key]?.toFixed(1);
+          }
+        }
+        match.match_key = Number(match.set_number).toFixed(0);
+        match.match_number =
+          match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
+        sf_elims_array.push(match);
+      } else if (match.comp_level === "f") {
+        for (const [key, value] of Object.entries(match)) {
+          if (typeof value === "number" && key.toLowerCase() !== "match_number") {
+            match[key] = match[key]?.toFixed(1);
+          }
+        }
+        match.match_key = match.match_number;
+        match.match_number =
+          match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
+        f_elims_array.push(match);
       }
     }
-    setPredictions(data_array);
+    sf_elims_array.sort(function (a, b) {
+      return a.match_key - b.match_key;
+    });
+
+    const elims_array = sf_elims_array.concat(f_elims_array);
+
+    setQualPredictions(quals_array);
+    setElimPredictions(elims_array);
   };
 
   const searchKeysCallback = async (data) => {
@@ -363,8 +347,9 @@ const Tables = () => {
           variant="fullWidth"
           aria-label="full width tabs"
         >
-          <Tab label="Event Ranking" {...a11yProps(0)} />
-          <Tab label="Match Prediction" {...a11yProps(1)} />
+          <Tab label="Rankings" {...a11yProps(0)} />
+          <Tab label="Quals" {...a11yProps(1)} />
+          {elimPredictions.length > 0 && <Tab label="Elims" {...a11yProps(2)} />}
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
@@ -383,7 +368,7 @@ const Tables = () => {
                         <StripedDataGrid
                           initialState={{
                             sorting: {
-                              sortModel: [{ field: 'OPR', sort: 'desc' }],
+                              sortModel: [{ field: "OPR", sort: "desc" }],
                             },
                           }}
                           disableColumnMenu
@@ -395,11 +380,12 @@ const Tables = () => {
                           pageSize={100}
                           rowsPerPageOptions={[100]}
                           components={{
-                              Toolbar: customToolbar,
-                              NoRowsOverlay: () => (
+                            Toolbar: customToolbar,
+                            NoRowsOverlay: () => (
                               <Stack height="100%" alignItems="center" justifyContent="center">
                                 No Match Data
-                              </Stack>)
+                              </Stack>
+                            ),
                           }}
                           sx={{
                             mx: 0.5,
@@ -410,7 +396,7 @@ const Tables = () => {
                             },
                           }}
                           getRowClassName={(params) =>
-                            params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+                            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
                           }
                         />
                       ) : (
@@ -439,17 +425,17 @@ const Tables = () => {
                 <div className="col">
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Match Predictions - {eventTitle}</h3>
+                      <h3 className="text-white mb-0">Qualifications Predictions - {eventTitle}</h3>
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                      <DataGrid
+                      <StripedDataGrid
                         initialState={{
                           sorting: {
-                            sortModel: [{ field: 'match_number', sort: 'asc' }],
+                            sortModel: [{ field: "match_number", sort: "asc" }],
                           },
                         }}
                         disableColumnMenu
-                        rows={predictions}
+                        rows={qualPredictions}
                         getRowId={(row) => {
                           return row.key;
                         }}
@@ -472,6 +458,55 @@ const Tables = () => {
                             </Stack>
                           ),
                         }}
+                        getRowClassName={(params) =>
+                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                        }
+                      />
+                    </div>
+                  </Card>
+                </div>
+              </Row>
+            </Container>
+          </ThemeProvider>
+        </TabPanel>
+        <TabPanel value={value} index={2} dir={darkTheme.direction}>
+          <ThemeProvider theme={darkTheme}>
+            <Container>
+              <Row>
+                <div className="col">
+                  <Card className="bg-gradient-default shadow">
+                    <CardHeader className="bg-transparent">
+                      <h3 className="text-white mb-0">Eliminations Predictions - {eventTitle}</h3>
+                    </CardHeader>
+                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                      <StripedDataGrid
+                        disableColumnMenu
+                        rows={elimPredictions}
+                        getRowId={(row) => {
+                          return row.key;
+                        }}
+                        columns={matchPredictionColumns}
+                        pageSize={100}
+                        rowsPerPageOptions={[100]}
+                        disableExtendRowFullWidth={true}
+                        sx={{
+                          boxShadow: 2,
+                          border: 0,
+                          borderColor: "white",
+                          "& .MuiDataGrid-cell:hover": {
+                            color: "white",
+                          },
+                        }}
+                        components={{
+                          NoRowsOverlay: () => (
+                            <Stack height="100%" alignItems="center" justifyContent="center">
+                              No Match Data
+                            </Stack>
+                          ),
+                        }}
+                        getRowClassName={(params) =>
+                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                        }
                       />
                     </div>
                   </Card>
@@ -492,5 +527,44 @@ const Tables = () => {
     </>
   );
 };
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+  },
+});
+
+const ODD_OPACITY = 0.2;
+
+const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
+  [`& .${gridClasses.row}.even`]: {
+    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
+    "&:hover, &.Mui-hovered": {
+      backgroundColor: alpha("#78829c", ODD_OPACITY),
+      "@media (hover: none)": {
+        backgroundColor: "transparent",
+      },
+    },
+    "&.Mui-selected": {
+      backgroundColor: alpha(
+        theme.palette.primary.main,
+        ODD_OPACITY + theme.palette.action.selectedOpacity
+      ),
+      "&:hover, &.Mui-hovered": {
+        backgroundColor: alpha(
+          theme.palette.primary.main,
+          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
+        ),
+        // Reset on touch devices, it doesn't add specificity
+        "@media (hover: none)": {
+          backgroundColor: alpha(
+            theme.palette.primary.main,
+            ODD_OPACITY + theme.palette.action.selectedOpacity
+          ),
+        },
+      },
+    },
+  },
+}));
 
 export default Tables;

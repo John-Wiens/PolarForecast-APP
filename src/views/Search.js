@@ -49,6 +49,7 @@ const Search = () => {
       <Autocomplete
         id="combo-box-demo"
         options={searchKeys ? searchKeys : []}
+        loading
         sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Select An Event" />}
         onChange={(event, newValue) => {
