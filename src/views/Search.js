@@ -19,6 +19,7 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getSearchKeys } from "api.js";
+import AdminFooter from "components/Footers/AdminFooter.js";
 
 const Search = () => {
   const [searchKeys, setSearchKeys] = React.useState([]);
@@ -41,7 +42,6 @@ const Search = () => {
     <div
       style={{
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
         margin: 20,
       }}
@@ -49,8 +49,9 @@ const Search = () => {
       <Autocomplete
         id="combo-box-demo"
         options={searchKeys ? searchKeys : []}
+        loading
         sx={{ width: 300 }}
-        renderInput={(params) => <TextField {...params} label="Search" />}
+        renderInput={(params) => <TextField {...params} label="Select An Event" />}
         onChange={(event, newValue) => {
           window.location.href = newValue.page;
         }}

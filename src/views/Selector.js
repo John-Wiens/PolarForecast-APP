@@ -35,7 +35,6 @@ const Selector = () => {
     if (type !== urlType) {
       setType(urlType);
     }
-    console.log(path);
     setEvent(path[4]);
   }, [window.location.href]);
 
