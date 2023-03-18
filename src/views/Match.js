@@ -154,7 +154,7 @@ const Match = () => {
       date = new Date(restData?.match.predicted_time * 1000);
     }
     const timeOfDay = date.toLocaleTimeString([], { hour: "numeric", minute: "numeric" });
-    setMatchTitle(restData?.prediction?.match_number + " - " + timeOfDay);
+    setMatchTitle(`#${restData?.prediction?.match_number} - ${timeOfDay}`);
     setBluePrediction(`${Math.round(restData?.prediction?.blue_score)} Points,  
       ${Math.round(restData?.prediction?.blue_win_rp)} RPs`);
     setRedPrediction(`${Math.round(restData?.prediction?.red_score)} Points,  
