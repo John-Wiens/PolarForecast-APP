@@ -50,6 +50,15 @@ const Team = () => {
     {
       field: "match_number",
       headerName: "Match",
+      sortable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
+      field: "data_type",
+      headerName: "Type",
       filterable: false,
       disableExport: true,
       headerAlign: "center",
@@ -89,18 +98,19 @@ const Team = () => {
       align: "center",
       flex: 0.5,
       renderCell: (params) => {
+        let showTrophy = false;
+        if (params.row.data_type === "Result"){ showTrophy = true; }
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
           if (params.row.alliance_color.toLowerCase() === "blue") {
             return (
               <Typography fontWeight="bold" color="primary">
-                <EmojiEventsIcon /> {params.value}
+                {showTrophy && <EmojiEventsIcon />} {params.value}
               </Typography>
             );
           } else {
             return (
               <Typography fontWeight="bold" color="primary">
-                {" "}
-                <MoodBadIcon /> {params.value}{" "}
+                {showTrophy && <MoodBadIcon />} {params.value}
               </Typography>
             );
           }
@@ -118,18 +128,19 @@ const Team = () => {
       align: "center",
       flex: 0.5,
       renderCell: (params) => {
+        let showTrophy = false;
+        if (params.row.data_type === "Result"){ showTrophy = true; }
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           if (params.row.alliance_color.toLowerCase() === "red") {
             return (
               <Typography fontWeight="bold" color="#FF0000">
-                <EmojiEventsIcon /> {params.value}
+                {showTrophy && <EmojiEventsIcon />} {params.value}
               </Typography>
             );
           } else {
             return (
               <Typography fontWeight="bold" color="#FF0000">
-                {" "}
-                <MoodBadIcon /> {params.value}{" "}
+                {showTrophy && <MoodBadIcon />} {params.value}
               </Typography>
             );
           }
@@ -163,7 +174,9 @@ const Team = () => {
   };
 
   const teamPredictionsCallback = async (data) => {
-    const rows = [];
+    const qual_rows = [];
+    const sf_rows = [];
+    const f_rows = [];
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
     const team = params[5].replace("team-", "frc");
@@ -175,15 +188,80 @@ const Team = () => {
         } else if (data.data[i].red_teams.find((obj) => obj === team)) {
           color = "Red";
         }
-        rows.push({
+        if ("blue_actual_score" in data.data[i]) {
+          data.data[i].data_type = "Result";
+          data.data[i].blue_score = data.data[i].blue_actual_score
+          data.data[i].red_score = data.data[i].red_actual_score
+        } else {
+          data.data[i].data_type = "Predicted";
+        }
+        qual_rows.push({
           key: data.data[i].key,
+          data_type: data.data[i].data_type,
           match_number: data.data[i].match_number,
           alliance_color: color,
-          blue_score: data.data[i].blue_score.toFixed(1),
-          red_score: data.data[i].red_score.toFixed(1),
+          blue_score: data.data[i].blue_score.toFixed(0),
+          red_score: data.data[i].red_score.toFixed(0),
+        });
+      } else if (data.data[i].comp_level === "sf") {
+        let color = "UNKOWN";
+        if (data.data[i].blue_teams.find((obj) => obj === team)) {
+          color = "Blue";
+        } else if (data.data[i].red_teams.find((obj) => obj === team)) {
+          color = "Red";
+        }
+        if ("blue_actual_score" in data.data[i]) {
+          data.data[i].data_type = "Result";
+          data.data[i].blue_score = data.data[i].blue_actual_score
+          data.data[i].red_score = data.data[i].red_actual_score
+        } else {
+          data.data[i].data_type = "Predicted";
+        }
+        sf_rows.push({
+          key: data.data[i].key,
+          data_type: data.data[i].data_type,
+          match_key : Number(data.data[i].set_number).toFixed(0),
+          match_number: data.data[i].comp_level.toUpperCase() + "-" + Number(data.data[i].set_number).toFixed(0),
+          alliance_color: color,
+          blue_score: data.data[i].blue_score.toFixed(0),
+          red_score: data.data[i].red_score.toFixed(0),
+        });
+      } else if (data.data[i].comp_level === "f") {
+        let color = "N/A";
+        if (data.data[i].blue_teams.find((obj) => obj === team)) {
+          color = "Blue";
+        } else if (data.data[i].red_teams.find((obj) => obj === team)) {
+          color = "Red";
+        }
+        if ("blue_actual_score" in data.data[i]) {
+          data.data[i].data_type = "Result";
+          data.data[i].blue_score = data.data[i].blue_actual_score
+          data.data[i].red_score = data.data[i].red_actual_score
+        } else {
+          data.data[i].data_type = "Predicted";
+        }
+        f_rows.push({
+          key: data.data[i].key,
+          data_type: data.data[i].data_type,
+          match_key : Number(data.data[i].match_number).toFixed(0),
+          match_number: data.data[i].comp_level.toUpperCase() + "-" + Number(data.data[i].match_number).toFixed(0),
+          alliance_color: color,
+          blue_score: data.data[i].blue_score.toFixed(0),
+          red_score: data.data[i].red_score.toFixed(0),
         });
       }
     }
+    qual_rows.sort(function (a, b) {
+      return a.match_number - b.match_number;
+    });
+    sf_rows.sort(function (a, b) {
+      return a.match_key - b.match_key;
+    });
+    f_rows.sort(function (a, b) {
+      return a.match_key - b.match_key;
+    });
+    const elims_rows = sf_rows.concat(f_rows);
+    const rows = qual_rows.concat(elims_rows);
     setMatchesRows(rows);
     setLoading(false);
   };
@@ -314,11 +392,6 @@ const Team = () => {
                     <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
                       {!loading ? (
                         <StripedDataGrid
-                          initialState={{
-                            sorting: {
-                              sortModel: [{ field: "match_number", sort: "asc" }],
-                            },
-                          }}
                           disableColumnMenu
                           rows={matchesRows}
                           getRowId={(row) => {

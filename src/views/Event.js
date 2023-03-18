@@ -63,6 +63,15 @@ const Tables = () => {
       flex: 0.5,
     },
     {
+      field: "data_type",
+      headerName: "Type",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
       field: "blue_score",
       headerName: "Blue Score",
       filterable: false,
@@ -71,11 +80,12 @@ const Tables = () => {
       align: "center",
       flex: 0.5,
       renderCell: (params) => {
+        let showTrophy = false;
+        if ("blue_actual_score" in params.row){ showTrophy = true; }
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="primary">
-              {" "}
-              <EmojiEventsIcon /> {params.value}{" "}
+              {showTrophy && <EmojiEventsIcon />} {params.value}
             </Typography>
           );
         } else {
@@ -92,10 +102,12 @@ const Tables = () => {
       align: "center",
       flex: 0.5,
       renderCell: (params) => {
+        let showTrophy = false;
+        if ("red_actual_score" in params.row){ showTrophy = true; }
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="#FF0000">
-              <EmojiEventsIcon /> {params.value}
+              {showTrophy && <EmojiEventsIcon />} {params.value}
             </Typography>
           );
         } else {
@@ -238,6 +250,13 @@ const Tables = () => {
             match[key] = match[key]?.toFixed(1);
           }
         }
+        if ("blue_actual_score" in match) {
+          match.data_type = "Result";
+          match.blue_score = match.blue_actual_score
+          match.red_score = match.red_actual_score
+        } else {
+          match.data_type = "Predicted";
+        }
         quals_array.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
@@ -245,9 +264,16 @@ const Tables = () => {
             match[key] = match[key]?.toFixed(1);
           }
         }
+        if ("blue_actual_score" in match) {
+          match.data_type = "Result";
+          match.blue_score = match.blue_actual_score
+          match.red_score = match.red_actual_score
+        } else {
+          match.data_type = "Predicted";
+        }
         match.match_key = Number(match.set_number).toFixed(0);
         match.match_number =
-          match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
+        match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
         sf_elims_array.push(match);
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
@@ -255,9 +281,16 @@ const Tables = () => {
             match[key] = match[key]?.toFixed(1);
           }
         }
+        if ("blue_actual_score" in match) {
+          match.data_type = "Result";
+          match.blue_score = match.blue_actual_score
+          match.red_score = match.red_actual_score
+        } else {
+          match.data_type = "Predicted";
+        }
         match.match_key = match.match_number;
         match.match_number =
-          match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
+        match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
         f_elims_array.push(match);
       }
     }
@@ -265,6 +298,10 @@ const Tables = () => {
       return a.match_key - b.match_key;
     });
 
+    f_elims_array.sort(function (a, b) {
+      return a.match_key - b.match_key;
+    });
+    
     const elims_array = sf_elims_array.concat(f_elims_array);
 
     setQualPredictions(quals_array);
