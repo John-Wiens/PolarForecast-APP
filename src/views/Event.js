@@ -243,7 +243,6 @@ const Tables = () => {
     const quals_array = [];
     const sf_elims_array = [];
     const f_elims_array = [];
-    console.log(data);
     for (const match of data.data) {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
