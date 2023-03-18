@@ -50,7 +50,7 @@ const Team = () => {
     {
       field: "match_number",
       headerName: "Match",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
