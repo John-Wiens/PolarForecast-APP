@@ -251,7 +251,7 @@ const Tables = () => {
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
@@ -268,7 +268,7 @@ const Tables = () => {
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
