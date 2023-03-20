@@ -21,14 +21,13 @@ import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
+import Link from '@mui/material/Link';
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
@@ -38,14 +37,12 @@ const Team = () => {
   const history = useHistory();
 
   const [loading, setLoading] = React.useState(true);
-
   const [teamInfo, setTeamInfo] = React.useState("");
   const [statDescription, setStatDescription] = useState([]);
   const [keys, setKeys] = useState([]);
   const [reportedStats, setReportedStats] = useState([]);
   const [value, setValue] = React.useState(0);
   const [teamNumber, setTeamNumber] = useState();
-
   const [columns, setColumns] = useState([
     {
       field: "match_number",
@@ -55,6 +52,17 @@ const Team = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsMatchOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     },
     {
       field: "data_type",
@@ -147,23 +155,6 @@ const Team = () => {
         } else {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
-      },
-    },
-    {
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsMatchOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
       },
     },
   ]);

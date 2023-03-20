@@ -40,6 +40,7 @@ import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import Link from '@mui/material/Link';
 import "../assets/css/polar-css.css";
 
 const Tables = () => {
@@ -61,6 +62,17 @@ const Tables = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsMatchOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     },
     {
       field: "data_type",
@@ -73,7 +85,7 @@ const Tables = () => {
     },
     {
       field: "blue_score",
-      headerName: "Blue Score",
+      headerName: "Blue",
       filterable: false,
       disableExport: true,
       headerAlign: "center",
@@ -95,7 +107,7 @@ const Tables = () => {
     },
     {
       field: "red_score",
-      headerName: "Red Score",
+      headerName: "Red",
       filterable: false,
       disableExport: true,
       headerAlign: "center",
@@ -114,24 +126,7 @@ const Tables = () => {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
       },
-    },
-    {
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsMatchOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
-      },
-    },
+    }
   ]);
   const [value, setValue] = React.useState(0);
 
@@ -157,6 +152,17 @@ const Tables = () => {
       align: "center",
       minWidth: 75,
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsTeamOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     });
 
     for (let i = 0; i < data.data.length; i++) {
@@ -176,23 +182,6 @@ const Tables = () => {
       }
     }
 
-    statColumns.push({
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsTeamOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
-      },
-    });
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
@@ -251,7 +240,7 @@ const Tables = () => {
           }
         }
         if ("blue_actual_score" in match) {
-          match.data_type = "Result";
+          match.data_type = "Actual";
           match.blue_score = match.blue_actual_score
           match.red_score = match.red_actual_score
         } else {
@@ -265,7 +254,7 @@ const Tables = () => {
           }
         }
         if ("blue_actual_score" in match) {
-          match.data_type = "Result";
+          match.data_type = "Actual";
           match.blue_score = match.blue_actual_score
           match.red_score = match.red_actual_score
         } else {
@@ -459,7 +448,7 @@ const Tables = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div className="col">
+                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Qualifications Predictions - {eventTitle}</h3>
@@ -510,7 +499,7 @@ const Tables = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div className="col">
+                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Eliminations Predictions - {eventTitle}</h3>
