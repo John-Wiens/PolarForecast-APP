@@ -67,7 +67,7 @@ const Team = () => {
     {
       field: "data_type",
       headerName: "Type",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -76,7 +76,7 @@ const Team = () => {
     {
       field: "alliance_color",
       headerName: "Color",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -100,7 +100,7 @@ const Team = () => {
     {
       field: "blue_score",
       headerName: "Blue Score",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -130,7 +130,7 @@ const Team = () => {
     {
       field: "red_score",
       headerName: "Red Score",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
