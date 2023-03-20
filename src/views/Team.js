@@ -189,7 +189,7 @@ const Team = () => {
         qual_rows.push({
           key: data.data[i].key,
           data_type: data.data[i].data_type,
-          match_number: data.data[i].match_number,
+          match_number: "QM-" + data.data[i].match_number,
           alliance_color: color,
           blue_score: data.data[i].blue_score.toFixed(0),
           red_score: data.data[i].red_score.toFixed(0),
@@ -243,7 +243,7 @@ const Team = () => {
       }
     }
     qual_rows.sort(function (a, b) {
-      return a.match_number - b.match_number;
+      return Number(a.match_number.split("-")[1]) - Number(b.match_number.split("-")[1]);
     });
     sf_rows.sort(function (a, b) {
       return a.match_key - b.match_key;

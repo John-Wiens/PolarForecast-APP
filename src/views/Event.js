@@ -57,7 +57,7 @@ const Tables = () => {
     {
       field: "match_number",
       headerName: "Match",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -77,7 +77,7 @@ const Tables = () => {
     {
       field: "data_type",
       headerName: "Type",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -86,7 +86,7 @@ const Tables = () => {
     {
       field: "blue_score",
       headerName: "Blue",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -108,7 +108,7 @@ const Tables = () => {
     {
       field: "red_score",
       headerName: "Red",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -236,7 +236,7 @@ const Tables = () => {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
@@ -246,6 +246,7 @@ const Tables = () => {
         } else {
           match.data_type = "Predicted";
         }
+        match.match_number = "QM-" + match.match_number
         quals_array.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
