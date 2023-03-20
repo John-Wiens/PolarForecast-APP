@@ -30,6 +30,7 @@ import {
   GridToolbarContainer,
   GridToolbarColumnsButton,
   GridToolbarExport,
+  GridToolbarDensitySelector,
   gridClasses,
 } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
@@ -327,6 +328,7 @@ const Tables = () => {
         <GridToolbarContainer className="text-white mb-0">
           <GridToolbarColumnsButton />
           <GridToolbarExport />
+          <GridToolbarDensitySelector />
         </GridToolbarContainer>
       </div>
     );
@@ -406,6 +408,13 @@ const Tables = () => {
                           columns={statColumns}
                           pageSize={100}
                           rowsPerPageOptions={[100]}
+                          getRowHeight={({ id, densityFactor }) => {
+                            if (id % 2 === 0) {
+                              return 50 * densityFactor;
+                            }
+                  
+                            return null;
+                          }}
                           components={{
                             Toolbar: customToolbar,
                             NoRowsOverlay: () => (
