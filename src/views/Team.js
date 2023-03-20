@@ -391,6 +391,7 @@ const Team = () => {
                           columns={columns}
                           pageSize={100}
                           rowsPerPageOptions={[100]}
+                          rowHeight={35}
                           sx={{
                             mx: 0.5,
                             border: 0,

@@ -244,7 +244,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {bluePrediction}</h4>
                     {blueResult && <h4 className="text-white mb-0">Result: {blueResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "320px", width: "100%" }}>
+                  <div style={{ height: "250px", width: "100%" }}>
                     {blueRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -255,6 +255,7 @@ const Match = () => {
                         columns={columns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         sx={{
                           mx: 0.5,
                           border: 0,
@@ -289,7 +290,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {redPrediction}</h4>
                     {redResult && <h4 className="text-white mb-0">Result: {redResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "320px", width: "100%" }}>
+                  <div style={{ height: "250px", width: "100%" }}>
                     {redRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -300,6 +301,7 @@ const Match = () => {
                         columns={columns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         sx={{
                           mx: 0.5,
                           border: 0,
