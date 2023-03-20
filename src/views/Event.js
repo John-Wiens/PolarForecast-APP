@@ -40,6 +40,7 @@ import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import Link from '@mui/material/Link';
 import "../assets/css/polar-css.css";
 
 const Tables = () => {
@@ -56,16 +57,27 @@ const Tables = () => {
     {
       field: "match_number",
       headerName: "Match",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsMatchOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     },
     {
       field: "data_type",
       headerName: "Type",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -73,8 +85,8 @@ const Tables = () => {
     },
     {
       field: "blue_score",
-      headerName: "Blue Score",
-      filterable: false,
+      headerName: "Blue",
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -95,8 +107,8 @@ const Tables = () => {
     },
     {
       field: "red_score",
-      headerName: "Red Score",
-      filterable: false,
+      headerName: "Red",
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -114,24 +126,7 @@ const Tables = () => {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
       },
-    },
-    {
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsMatchOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
-      },
-    },
+    }
   ]);
   const [value, setValue] = React.useState(0);
 
@@ -157,6 +152,17 @@ const Tables = () => {
       align: "center",
       minWidth: 75,
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsTeamOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     });
 
     for (let i = 0; i < data.data.length; i++) {
@@ -176,23 +182,6 @@ const Tables = () => {
       }
     }
 
-    statColumns.push({
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsTeamOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
-      },
-    });
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
@@ -247,7 +236,7 @@ const Tables = () => {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
@@ -257,11 +246,12 @@ const Tables = () => {
         } else {
           match.data_type = "Predicted";
         }
+        match.match_number = "QM-" + match.match_number
         quals_array.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
@@ -278,7 +268,7 @@ const Tables = () => {
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
-            match[key] = match[key]?.toFixed(1);
+            match[key] = match[key]?.toFixed(0);
           }
         }
         if ("blue_actual_score" in match) {
@@ -416,6 +406,7 @@ const Tables = () => {
                           columns={statColumns}
                           pageSize={100}
                           rowsPerPageOptions={[100]}
+                          rowHeight={35}
                           components={{
                             Toolbar: customToolbar,
                             NoRowsOverlay: () => (
@@ -459,7 +450,7 @@ const Tables = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div className="col">
+                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Qualifications Predictions - {eventTitle}</h3>
@@ -479,6 +470,7 @@ const Tables = () => {
                         columns={matchPredictionColumns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         disableExtendRowFullWidth={true}
                         sx={{
                           boxShadow: 2,
@@ -510,7 +502,7 @@ const Tables = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div className="col">
+                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                   <Card className="bg-gradient-default shadow">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Eliminations Predictions - {eventTitle}</h3>
@@ -525,6 +517,7 @@ const Tables = () => {
                         columns={matchPredictionColumns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         disableExtendRowFullWidth={true}
                         sx={{
                           boxShadow: 2,

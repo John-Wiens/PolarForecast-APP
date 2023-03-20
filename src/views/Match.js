@@ -16,48 +16,22 @@
 
 */
 import { Card, CardHeader, Container, Row } from "reactstrap";
+import { useHistory } from "react-router-dom";
 import { alpha, styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { getMatchDetails } from "api.js";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import Link from '@mui/material/Link';
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
 
-const generateColumns = (fieldName, headerName) => {
-  const tempColumns = [];
-  const length = fieldName.length;
-  for (let i = 0; i < length; i++) {
-    let newColumn = {
-      field: "",
-      headerName: "",
-      filterable: false,
-      disableExport: true,
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      key: i + 1,
-    };
-    if (i === 0) {
-      const obj = { ...newColumn };
-      obj.headerName = "Team";
-      obj.field = "team";
-      obj.key = i;
-      tempColumns.push(obj);
-    }
-    newColumn.headerName = headerName[i];
-    newColumn.field = fieldName[i];
-    tempColumns.push(newColumn);
-  }
-
-  return tempColumns;
-};
-
 const Match = () => {
-  const [loading, setLoading] = useState(true);
+  const history = useHistory();
 
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [matchTitle, setMatchTitle] = useState(false);
   const [bluePrediction, setBluePrediction] = useState(false);
@@ -65,11 +39,72 @@ const Match = () => {
   const [redPrediction, setRedPrediction] = useState(false);
   const [redResult, setRedResult] = useState(false);
   const [redTitle, setRedTitle] = useState(false);
-  const [columns, setColumns] = useState([]);
   const [blueRows, setBlueRows] = useState([]);
   const [redRows, setRedRows] = useState([]);
   const [blueWinner, setBlueWinner] = useState(false);
   const [redWinner, setRedWinner] = useState(false);
+  const [columns, setColumns] = useState([
+    {
+      field: "team",
+      headerName: "Team",
+      sortable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsTeamOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
+    },
+    {
+      field: "auto_score",
+      headerName: "Auto",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
+      field: "auto_charge_station",
+      headerName: "Auto CS",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
+      field: "teleop_score",
+      headerName: "Teleop",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    },
+    {
+      field: "end_game",
+      headerName: "End Game",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.5,
+    }
+  ]);
+
+  const statisticsTeamOnClick = (cellValues) => {
+    history.push("team-" + cellValues.team);
+  };
 
   const matchInfoCallback = async (restData) => {
     setData(restData);
@@ -79,10 +114,12 @@ const Match = () => {
     let blueAutoScore = 0;
     let blueChargeStation = 0;
     let blueTeleop = 0;
+    console.log(restData);
     for (const team of restData?.blue_teams) {
       newRow = {
         key: i,
         team: team.key.replace("frc", ""),
+        OPR: team.OPR.toFixed(1),
         auto_score: team.autoPoints.toFixed(1),
         auto_charge_station: team.autoChargeStation.toFixed(1),
         teleop_score: team.teleopPoints.toFixed(1),
@@ -176,12 +213,7 @@ const Match = () => {
     const year = params[3];
     const eventKey = params[4];
     const match = params[5].split("-")[1];
-    setColumns(
-      generateColumns(
-        ["auto_score", "auto_charge_station", "teleop_score", "end_game"],
-        ["Auto Score", "Charge Station", "Teleop Score", "End Game"]
-      )
-    );
+    
     getMatchDetails(year, eventKey, match, matchInfoCallback);
   }, []);
 
@@ -212,7 +244,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {bluePrediction}</h4>
                     {blueResult && <h4 className="text-white mb-0">Result: {blueResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "320px", width: "100%" }}>
+                  <div style={{ height: "250px", width: "100%" }}>
                     {blueRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -223,6 +255,7 @@ const Match = () => {
                         columns={columns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         sx={{
                           mx: 0.5,
                           border: 0,
@@ -257,7 +290,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {redPrediction}</h4>
                     {redResult && <h4 className="text-white mb-0">Result: {redResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "320px", width: "100%" }}>
+                  <div style={{ height: "250px", width: "100%" }}>
                     {redRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -268,6 +301,7 @@ const Match = () => {
                         columns={columns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
+                        rowHeight={35}
                         sx={{
                           mx: 0.5,
                           border: 0,

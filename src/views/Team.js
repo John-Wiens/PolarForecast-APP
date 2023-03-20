@@ -21,14 +21,13 @@ import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
+import Link from '@mui/material/Link';
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
 import { useHistory } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
@@ -38,14 +37,12 @@ const Team = () => {
   const history = useHistory();
 
   const [loading, setLoading] = React.useState(true);
-
   const [teamInfo, setTeamInfo] = React.useState("");
   const [statDescription, setStatDescription] = useState([]);
   const [keys, setKeys] = useState([]);
   const [reportedStats, setReportedStats] = useState([]);
   const [value, setValue] = React.useState(0);
   const [teamNumber, setTeamNumber] = useState();
-
   const [columns, setColumns] = useState([
     {
       field: "match_number",
@@ -55,11 +52,22 @@ const Team = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsMatchOnClick(params.row);
+        return (
+          <Link 
+            component="button"
+            onClick={onClick}
+            underline="always">
+            {params.value}
+          </Link>
+        );
+      },
     },
     {
       field: "data_type",
       headerName: "Type",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -68,7 +76,7 @@ const Team = () => {
     {
       field: "alliance_color",
       headerName: "Color",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -92,7 +100,7 @@ const Team = () => {
     {
       field: "blue_score",
       headerName: "Blue Score",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -122,7 +130,7 @@ const Team = () => {
     {
       field: "red_score",
       headerName: "Red Score",
-      filterable: false,
+      sortable: false,
       disableExport: true,
       headerAlign: "center",
       align: "center",
@@ -147,23 +155,6 @@ const Team = () => {
         } else {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
-      },
-    },
-    {
-      field: "Info",
-      headerName: "Info",
-      sortable: false,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 70,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsMatchOnClick(params.row);
-        return (
-          <IconButton onClick={onClick}>
-            <InfoIcon />{" "}
-          </IconButton>
-        );
       },
     },
   ]);
@@ -198,7 +189,7 @@ const Team = () => {
         qual_rows.push({
           key: data.data[i].key,
           data_type: data.data[i].data_type,
-          match_number: data.data[i].match_number,
+          match_number: "QM-" + data.data[i].match_number,
           alliance_color: color,
           blue_score: data.data[i].blue_score.toFixed(0),
           red_score: data.data[i].red_score.toFixed(0),
@@ -252,7 +243,7 @@ const Team = () => {
       }
     }
     qual_rows.sort(function (a, b) {
-      return a.match_number - b.match_number;
+      return Number(a.match_number.split("-")[1]) - Number(b.match_number.split("-")[1]);
     });
     sf_rows.sort(function (a, b) {
       return a.match_key - b.match_key;
@@ -400,6 +391,7 @@ const Team = () => {
                           columns={columns}
                           pageSize={100}
                           rowsPerPageOptions={[100]}
+                          rowHeight={35}
                           sx={{
                             mx: 0.5,
                             border: 0,
