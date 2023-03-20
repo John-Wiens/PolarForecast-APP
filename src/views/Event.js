@@ -240,7 +240,7 @@ const Tables = () => {
           }
         }
         if ("blue_actual_score" in match) {
-          match.data_type = "Actual";
+          match.data_type = "Result";
           match.blue_score = match.blue_actual_score
           match.red_score = match.red_actual_score
         } else {
@@ -255,7 +255,7 @@ const Tables = () => {
           }
         }
         if ("blue_actual_score" in match) {
-          match.data_type = "Actual";
+          match.data_type = "Result";
           match.blue_score = match.blue_actual_score
           match.red_score = match.red_actual_score
         } else {
