@@ -114,7 +114,6 @@ const Match = () => {
     let blueAutoScore = 0;
     let blueChargeStation = 0;
     let blueTeleop = 0;
-    console.log(restData);
     for (const team of restData?.blue_teams) {
       newRow = {
         key: i,
