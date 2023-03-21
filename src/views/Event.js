@@ -229,9 +229,9 @@ const Tables = () => {
   };
 
   const predictionsCallback = async (data) => {
-    const quals_array = [];
-    const sf_elims_array = [];
-    const f_elims_array = [];
+    const qual_rows = [];
+    const sf_rows = [];
+    const f_rows = [];
     for (const match of data.data) {
       if (match.comp_level === "qm") {
         for (const [key, value] of Object.entries(match)) {
@@ -246,8 +246,9 @@ const Tables = () => {
         } else {
           match.data_type = "Predicted";
         }
+        match.sort = Number(match.match_number);
         match.match_number = "QM-" + match.match_number
-        quals_array.push(match);
+        qual_rows.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
@@ -264,7 +265,7 @@ const Tables = () => {
         match.match_key = Number(match.set_number).toFixed(0);
         match.match_number =
         match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
-        sf_elims_array.push(match);
+        sf_rows.push(match);
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
           if (typeof value === "number" && key.toLowerCase() !== "match_number") {
@@ -281,21 +282,24 @@ const Tables = () => {
         match.match_key = match.match_number;
         match.match_number =
         match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
-        f_elims_array.push(match);
+        f_rows.push(match);
       }
     }
-    sf_elims_array.sort(function (a, b) {
+    qual_rows.sort(function (a, b) {
+      return a.sort - b.sort;
+    });
+    sf_rows.sort(function (a, b) {
       return a.match_key - b.match_key;
     });
 
-    f_elims_array.sort(function (a, b) {
+    f_rows.sort(function (a, b) {
       return a.match_key - b.match_key;
     });
     
-    const elims_array = sf_elims_array.concat(f_elims_array);
+    const elim_rows = sf_rows.concat(f_rows);
 
-    setQualPredictions(quals_array);
-    setElimPredictions(elims_array);
+    setQualPredictions(qual_rows);
+    setElimPredictions(elim_rows);
   };
 
   const searchKeysCallback = async (data) => {
@@ -375,7 +379,7 @@ const Tables = () => {
           aria-label="full width tabs"
         >
           <Tab label="Rankings" {...a11yProps(0)} />
-          <Tab label="Quals" {...a11yProps(1)} />
+          {qualPredictions.length > 0 && <Tab label="Quals" {...a11yProps(1)} />}
           {elimPredictions.length > 0 && <Tab label="Elims" {...a11yProps(2)} />}
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
@@ -457,11 +461,6 @@ const Tables = () => {
                     </CardHeader>
                     <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
                       <StripedDataGrid
-                        initialState={{
-                          sorting: {
-                            sortModel: [{ field: "match_number", sort: "asc" }],
-                          },
-                        }}
                         disableColumnMenu
                         rows={qualPredictions}
                         getRowId={(row) => {
