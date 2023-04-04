@@ -14,3 +14,14 @@
 .svg_icons {
   transform: scale(1.5);
 }
+
+.polar-box {
+  border-radius:0;
+  background: linear-gradient(87deg, #172b4d 0, #1a174d 100%) !important;
+}
+
+@media only screen and (max-width: 600px) {
+  .MuiFormControl-root {
+    display: none;
+  }
+}

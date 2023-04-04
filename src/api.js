@@ -204,3 +204,27 @@ export const getTeamMatchPredictions = async (year, event, team, callback) => {
     console.error(error);
   }
 };
+
+export const getLeaderboard = async (year, callback) => {
+  try {
+    const storage_name = year + "_leaderboard";
+    const data = getWithExpiry(storage_name);
+    if (data === null) {
+      const endpoint = `${API_ENDPOINT}/${year}/leaderboard`;
+      console.log("Requesting Data from: " + endpoint);
+      const response = await fetch(endpoint);
+      if (response.ok) {
+        const data = await response.json();
+        setWithExpiry(storage_name, data, default_ttl);
+        callback(data);
+      } else {
+        callback({ data: [] });
+      }
+    } else {
+      console.log("Using cached data for: " + storage_name);
+      callback(data);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};

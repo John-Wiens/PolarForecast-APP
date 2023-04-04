@@ -375,12 +375,12 @@ const Team = () => {
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
+                <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
+                  <Card className="polar-box">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Team {teamNumber} Schedule</h3>
                     </CardHeader>
-                    <div style={{ height: "calc(100vh - 290px)", width: "100%" }}>
+                    <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
                       {!loading ? (
                         <StripedDataGrid
                           disableColumnMenu
@@ -393,7 +393,7 @@ const Team = () => {
                           rowsPerPageOptions={[100]}
                           rowHeight={35}
                           sx={{
-                            mx: 0.5,
+                            boxShadow: 2,
                             border: 0,
                             borderColor: "white",
                             "& .MuiDataGrid-cell:hover": {
@@ -417,7 +417,7 @@ const Team = () => {
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center",
-                            minHeight: "calc(100vh - 290px)",
+                            minHeight: "calc(100vh - 250px)",
                           }}
                         >
                           <CircularProgress />
@@ -475,7 +475,7 @@ const Team = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  minHeight: "calc(100vh - 290px)",
+                  minHeight: "calc(100vh - 250px)",
                 }}
               >
                 <CircularProgress />

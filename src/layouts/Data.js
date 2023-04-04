@@ -18,7 +18,7 @@
 import React from "react";
 import { useLocation, Route, Switch, Redirect } from "react-router-dom";
 import { Container } from "reactstrap";
-import AdminFooter from "components/Footers/AdminFooter.js";
+import Footer from "components/Footers/Footer.js";
 import Selector from "views/Selector.js";
 
 import routes from "routes.js";
@@ -62,10 +62,8 @@ const Data = (props) => {
           {getRoutes(routes)}
           <Redirect from="*" to="/data/index" />
         </Switch>
-        <Container fluid>
-          <AdminFooter />
-        </Container>
       </div>
+      <Footer/>
     </>
   );
 };

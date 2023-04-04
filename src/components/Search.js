@@ -19,10 +19,11 @@ import React from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getSearchKeys } from "api.js";
-import AdminFooter from "components/Footers/AdminFooter.js";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-const Search = () => {
+const Search = (props) => {
   const [searchKeys, setSearchKeys] = React.useState([]);
+  const width = props.width || "300px";
 
   const searchKeyCallback = async (data) => {
     const terms = [];
@@ -39,25 +40,31 @@ const Search = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        margin: 20,
-      }}
-    >
       <Autocomplete
-        id="combo-box-demo"
         options={searchKeys ? searchKeys : []}
         loading
-        sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Select An Event" />}
         onChange={(event, newValue) => {
           window.location.href = newValue.page;
         }}
+        sx={{
+          width: {width},
+          padding: 1
+        }}
       />
-    </div>
   );
 };
+
+const darkTheme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#3f51b5',
+    },
+    secondary: {
+      main: '#f50057',
+    },
+  },
+});
 
 export default Search;

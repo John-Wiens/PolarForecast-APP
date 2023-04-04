@@ -35,8 +35,6 @@ import {
 import { useHistory } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
@@ -45,8 +43,13 @@ import "../assets/css/polar-css.css";
 
 const Tables = () => {
   const history = useHistory();
-
+  const tabDict = [
+    "rankings",
+    "quals",
+    "elims",
+  ]
   const [statDescription, setStatDescription] = useState([]);
+  const [tabIndex, setTabIndex] = useState(0);
   const [eventTitle, setEventTitle] = useState("");
   const [rankings, setRankings] = useState([]);
   const [qualPredictions, setQualPredictions] = useState([]);
@@ -133,7 +136,7 @@ const Tables = () => {
   const statDescriptionCallback = async (data) => {
     const keys = [];
     const statColumns = [];
-
+    console.log(data);
     statColumns.push({
       field: "id",
       headerName: "",
@@ -165,9 +168,22 @@ const Tables = () => {
       },
     });
 
+    statColumns.push({
+      field: "OPR",
+      headerName: "OPR",
+      type: "number",
+      sortable: true,
+      headerAlign: "center",
+      align: "center",
+      minWidth: 70,
+      flex: 0.5,
+    });
+
+    console.log(data.data);
+
     for (let i = 0; i < data.data.length; i++) {
       const stat = data.data[i];
-      if (stat.report_stat) {
+      if (stat.report_stat && stat.stat_key !== "OPR") {
         keys.push(stat.stat_key);
         statColumns.push({
           field: stat.stat_key,
@@ -319,6 +335,8 @@ const Tables = () => {
     const year = params[3];
     const eventKey = params[4];
 
+    setTabIndex(tabDict.indexOf(String(window.location.hash.split("#")[1])))
+
     getStatDescription(year, eventKey, statDescriptionCallback);
     getRankings(year, eventKey, rankingsCallback);
     getMatchPredictions(year, eventKey, predictionsCallback);
@@ -362,8 +380,10 @@ const Tables = () => {
     };
   }
 
+
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    history.push({hash: tabDict[newValue]})
+    setTabIndex(newValue);
   };
 
   return (
@@ -371,7 +391,7 @@ const Tables = () => {
       <Header />
       <AppBar position="static">
         <Tabs
-          value={value}
+          value={tabIndex}
           onChange={handleChange}
           indicatorColor="secondary"
           textColor="inherit"
@@ -385,16 +405,16 @@ const Tables = () => {
         </Tabs>
       </AppBar>
       <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
-        <TabPanel value={value} index={0} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={0} dir={darkTheme.direction}>
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
+                <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
+                  <Card className="polar-box">
                     <CardHeader className="bg-transparent">
                       <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
                     </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                    <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
                       {rankings.length > 0 ? (
                         <StripedDataGrid
                           initialState={{
@@ -403,6 +423,7 @@ const Tables = () => {
                             },
                           }}
                           disableColumnMenu
+                          sortingOrder={['desc', 'asc']}
                           rows={rankings}
                           getRowId={(row) => {
                             return row.key;
@@ -450,16 +471,16 @@ const Tables = () => {
             </Container>
           </ThemeProvider>
         </TabPanel>
-        <TabPanel value={value} index={1} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={1} dir={darkTheme.direction}>
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
+                <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
+                  <Card className="polar-box">
                     <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Qualifications Predictions - {eventTitle}</h3>
+                      <h3 className="text-white mb-0">Qualifications - {eventTitle}</h3>
                     </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                    <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
                       <StripedDataGrid
                         disableColumnMenu
                         rows={qualPredictions}
@@ -497,16 +518,16 @@ const Tables = () => {
             </Container>
           </ThemeProvider>
         </TabPanel>
-        <TabPanel value={value} index={2} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={2} dir={darkTheme.direction}>
           <ThemeProvider theme={darkTheme}>
             <Container>
               <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
+                <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
+                  <Card className="polar-box">
                     <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Eliminations Predictions - {eventTitle}</h3>
+                      <h3 className="text-white mb-0">Eliminations - {eventTitle}</h3>
                     </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
+                    <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
                       <StripedDataGrid
                         disableColumnMenu
                         rows={elimPredictions}

@@ -27,6 +27,7 @@ import Link from '@mui/material/Link';
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
+import "../assets/css/polar-css.css"; 
 
 const Match = () => {
   const history = useHistory();
@@ -223,8 +224,8 @@ const Match = () => {
           <Container>
             <Row>
               <div style={{ width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
+                <Card className="polar-box">
+                  <CardHeader className="bg-transparent" style={{ textAlign: 'center' }}>
                     <h1 className="text-white mb-0">Match {matchTitle}</h1>
                     {/* <h3 className="text-white mb-0">Prediction: {matchPrediction}</h3>
                     {matchResult && <h3 className="text-white mb-0">Result: {matchResult}</h3>} */}
@@ -235,7 +236,7 @@ const Match = () => {
 
             <Row>
               <div style={{ width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
+                <Card className="polar-box">
                   <CardHeader className="bg-transparent">
                     <h3 style={{ color: "#90caf9" }}>
                       {blueWinner && <EmojiEventsIcon />}Blue Alliance
@@ -243,7 +244,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {bluePrediction}</h4>
                     {blueResult && <h4 className="text-white mb-0">Result: {blueResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "250px", width: "100%" }}>
+                  <div style={{ height: "200px", width: "100%" }}>
                     {blueRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -252,9 +253,11 @@ const Match = () => {
                           return row.key;
                         }}
                         columns={columns}
+                        hideFooter
                         pageSize={100}
                         rowsPerPageOptions={[100]}
                         rowHeight={35}
+                        options={{ pagination: false }}
                         sx={{
                           mx: 0.5,
                           border: 0,
@@ -281,7 +284,7 @@ const Match = () => {
                     )}
                   </div>
                 </Card>
-                <Card className="bg-gradient-default shadow">
+                <Card className="polar-box">
                   <CardHeader className="bg-transparent">
                     <h3 style={{ color: "#FF0000" }}>
                       {redWinner && <EmojiEventsIcon />}Red Alliance
@@ -289,7 +292,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {redPrediction}</h4>
                     {redResult && <h4 className="text-white mb-0">Result: {redResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "250px", width: "100%" }}>
+                  <div style={{ height: "200px", width: "100%" }}>
                     {redRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -301,6 +304,7 @@ const Match = () => {
                         pageSize={100}
                         rowsPerPageOptions={[100]}
                         rowHeight={35}
+                        hideFooter
                         sx={{
                           mx: 0.5,
                           border: 0,
