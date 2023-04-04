@@ -63,7 +63,7 @@ const Data = (props) => {
           <Redirect from="*" to="/data/index" />
         </Switch>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };

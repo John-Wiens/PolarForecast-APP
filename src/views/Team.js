@@ -21,7 +21,7 @@ import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
-import Link from '@mui/material/Link';
+import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
 import React, { useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -55,10 +55,7 @@ const Team = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsMatchOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
@@ -107,7 +104,9 @@ const Team = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if (params.row.data_type === "Result"){ showTrophy = true; }
+        if (params.row.data_type === "Result") {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
           if (params.row.alliance_color.toLowerCase() === "blue") {
             return (
@@ -137,7 +136,9 @@ const Team = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if (params.row.data_type === "Result"){ showTrophy = true; }
+        if (params.row.data_type === "Result") {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           if (params.row.alliance_color.toLowerCase() === "red") {
             return (
@@ -181,8 +182,8 @@ const Team = () => {
         }
         if ("blue_actual_score" in data.data[i]) {
           data.data[i].data_type = "Result";
-          data.data[i].blue_score = data.data[i].blue_actual_score
-          data.data[i].red_score = data.data[i].red_actual_score
+          data.data[i].blue_score = data.data[i].blue_actual_score;
+          data.data[i].red_score = data.data[i].red_actual_score;
         } else {
           data.data[i].data_type = "Predicted";
         }
@@ -203,16 +204,19 @@ const Team = () => {
         }
         if ("blue_actual_score" in data.data[i]) {
           data.data[i].data_type = "Result";
-          data.data[i].blue_score = data.data[i].blue_actual_score
-          data.data[i].red_score = data.data[i].red_actual_score
+          data.data[i].blue_score = data.data[i].blue_actual_score;
+          data.data[i].red_score = data.data[i].red_actual_score;
         } else {
           data.data[i].data_type = "Predicted";
         }
         sf_rows.push({
           key: data.data[i].key,
           data_type: data.data[i].data_type,
-          match_key : Number(data.data[i].set_number).toFixed(0),
-          match_number: data.data[i].comp_level.toUpperCase() + "-" + Number(data.data[i].set_number).toFixed(0),
+          match_key: Number(data.data[i].set_number).toFixed(0),
+          match_number:
+            data.data[i].comp_level.toUpperCase() +
+            "-" +
+            Number(data.data[i].set_number).toFixed(0),
           alliance_color: color,
           blue_score: data.data[i].blue_score.toFixed(0),
           red_score: data.data[i].red_score.toFixed(0),
@@ -226,16 +230,19 @@ const Team = () => {
         }
         if ("blue_actual_score" in data.data[i]) {
           data.data[i].data_type = "Result";
-          data.data[i].blue_score = data.data[i].blue_actual_score
-          data.data[i].red_score = data.data[i].red_actual_score
+          data.data[i].blue_score = data.data[i].blue_actual_score;
+          data.data[i].red_score = data.data[i].red_actual_score;
         } else {
           data.data[i].data_type = "Predicted";
         }
         f_rows.push({
           key: data.data[i].key,
           data_type: data.data[i].data_type,
-          match_key : Number(data.data[i].match_number).toFixed(0),
-          match_number: data.data[i].comp_level.toUpperCase() + "-" + Number(data.data[i].match_number).toFixed(0),
+          match_key: Number(data.data[i].match_number).toFixed(0),
+          match_number:
+            data.data[i].comp_level.toUpperCase() +
+            "-" +
+            Number(data.data[i].match_number).toFixed(0),
           alliance_color: color,
           blue_score: data.data[i].blue_score.toFixed(0),
           red_score: data.data[i].red_score.toFixed(0),

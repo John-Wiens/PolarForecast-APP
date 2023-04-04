@@ -23,11 +23,11 @@ import { getMatchDetails } from "api.js";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import Link from '@mui/material/Link';
+import Link from "@mui/material/Link";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
-import "../assets/css/polar-css.css"; 
+import "../assets/css/polar-css.css";
 
 const Match = () => {
   const history = useHistory();
@@ -56,10 +56,7 @@ const Match = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsTeamOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
@@ -100,7 +97,7 @@ const Match = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
-    }
+    },
   ]);
 
   const statisticsTeamOnClick = (cellValues) => {
@@ -213,7 +210,7 @@ const Match = () => {
     const year = params[3];
     const eventKey = params[4];
     const match = params[5].split("-")[1];
-    
+
     getMatchDetails(year, eventKey, match, matchInfoCallback);
   }, []);
 
@@ -225,7 +222,7 @@ const Match = () => {
             <Row>
               <div style={{ width: "100%" }}>
                 <Card className="polar-box">
-                  <CardHeader className="bg-transparent" style={{ textAlign: 'center' }}>
+                  <CardHeader className="bg-transparent" style={{ textAlign: "center" }}>
                     <h1 className="text-white mb-0">Match {matchTitle}</h1>
                     {/* <h3 className="text-white mb-0">Prediction: {matchPrediction}</h3>
                     {matchResult && <h3 className="text-white mb-0">Result: {matchResult}</h3>} */}

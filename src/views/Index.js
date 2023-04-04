@@ -24,10 +24,7 @@ import Snowfall from "react-snowfall";
 import React, { useEffect, useState } from "react";
 import { getLeaderboard } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import {
-  DataGrid,
-  gridClasses
-} from "@mui/x-data-grid";
+import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import Stack from "@mui/material/Stack";
 
 const Index = (props) => {
@@ -64,7 +61,7 @@ const Index = (props) => {
       disableExport: true,
       headerAlign: "center",
       align: "center",
-      flex: 0.5
+      flex: 0.5,
     },
     {
       field: "teleopPoints",
@@ -81,7 +78,7 @@ const Index = (props) => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
-    }
+    },
   ]);
 
   if (window.Chart) {
@@ -114,78 +111,74 @@ const Index = (props) => {
         }
       }
     }
-    console.log(data.data);
     setLeaderboardRows(data.data);
   };
 
   useEffect(() => {
     const now = new Date();
     const currentYear = now.getFullYear();
-    console.log(currentYear)
     getLeaderboard(currentYear, leaderboardCallback);
   }, []);
 
   return (
     <>
       <Header />
-
       <div style={{ height: "calc(100vh - 180px)", width: "100%" }}>
-        <Snowfall
-          snowflakeCount={50}
-          style={{
-            position: "fixed",
-            width: "100vw",
-            height: "100vh",
-          }}
-        ></Snowfall>
-        {/* <Search></Search> */}
         <ThemeProvider theme={darkTheme}>
-            <Container>
-              <Row>
-                <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
-                  <Card className="polar-box">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Global Leaderboard</h3>
-                    </CardHeader>
-                    <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
-                      <StripedDataGrid
-                        disableColumnMenu
-                        rows={leaderboardRows}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        sortingOrder={['desc', 'asc']}
-                        columns={leaderboardColumns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
-                        rowHeight={35}
-                        disableExtendRowFullWidth={true}
-                        sx={{
-                          boxShadow: 2,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
-                        }}
-                        components={{
-                          NoRowsOverlay: () => (
-                            <Stack height="100%" alignItems="center" justifyContent="center">
-                              No Match Data
-                            </Stack>
-                          ),
-                        }}
-                        getRowClassName={(params) =>
-                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-                        }
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </Row>
-            </Container>
-          </ThemeProvider>
+          <Container>
+            <Row>
+              <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
+                <Card className="polar-box">
+                  <CardHeader className="bg-transparent">
+                    <h3 className="text-white mb-0">Global Leaderboard</h3>
+                  </CardHeader>
+                  <div style={{ height: "calc(100vh - 200px)", width: "100%" }}>
+                    <StripedDataGrid
+                      disableColumnMenu
+                      rows={leaderboardRows}
+                      getRowId={(row) => {
+                        return row.key;
+                      }}
+                      sortingOrder={["desc", "asc"]}
+                      columns={leaderboardColumns}
+                      pageSize={100}
+                      rowsPerPageOptions={[100]}
+                      rowHeight={35}
+                      disableExtendRowFullWidth={true}
+                      sx={{
+                        boxShadow: 2,
+                        border: 0,
+                        borderColor: "white",
+                        "& .MuiDataGrid-cell:hover": {
+                          color: "white",
+                        },
+                      }}
+                      components={{
+                        NoRowsOverlay: () => (
+                          <Stack height="100%" alignItems="center" justifyContent="center">
+                            No Match Data
+                          </Stack>
+                        ),
+                      }}
+                      getRowClassName={(params) =>
+                        params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                      }
+                    />
+                  </div>
+                </Card>
+              </div>
+            </Row>
+          </Container>
+        </ThemeProvider>
       </div>
+      <Snowfall
+        snowflakeCount={50}
+        style={{
+          position: "fixed",
+          width: "100vw",
+          height: "100vh",
+        }}
+      ></Snowfall>
     </>
   );
 };

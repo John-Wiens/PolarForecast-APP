@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from '@mui/icons-material/Search';
+import SearchIcon from "@mui/icons-material/Search";
 import Container from "@mui/material/Container";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
@@ -25,7 +25,7 @@ function ResponsiveAppBar() {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const params = url.pathname.split("/");   
+    const params = url.pathname.split("/");
     if (params.length > 5) {
       const temp_link = "/" + params[1] + "/" + params[2] + "/" + params[3] + "/" + params[4];
       setLink(temp_link);
@@ -101,7 +101,7 @@ function ResponsiveAppBar() {
                 display: { xs: "block", md: "none" },
               }}
             >
-              <Search width="375px"/>
+              <Search width="375px" />
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page}</Typography>
@@ -146,7 +146,7 @@ function ResponsiveAppBar() {
           </Box>
           <Stack direction="row" justifyContent="end">
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-              <Search width="400px"/>
+              <Search width="400px" />
             </Box>
           </Stack>
         </Toolbar>

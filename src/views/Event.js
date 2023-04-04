@@ -38,16 +38,12 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import Link from '@mui/material/Link';
+import Link from "@mui/material/Link";
 import "../assets/css/polar-css.css";
 
 const Tables = () => {
   const history = useHistory();
-  const tabDict = [
-    "rankings",
-    "quals",
-    "elims",
-  ]
+  const tabDict = ["rankings", "quals", "elims"];
   const [statDescription, setStatDescription] = useState([]);
   const [tabIndex, setTabIndex] = useState(0);
   const [eventTitle, setEventTitle] = useState("");
@@ -68,10 +64,7 @@ const Tables = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsMatchOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
@@ -96,7 +89,9 @@ const Tables = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if ("blue_actual_score" in params.row){ showTrophy = true; }
+        if ("blue_actual_score" in params.row) {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="primary">
@@ -118,7 +113,9 @@ const Tables = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if ("red_actual_score" in params.row){ showTrophy = true; }
+        if ("red_actual_score" in params.row) {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="#FF0000">
@@ -129,14 +126,12 @@ const Tables = () => {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
       },
-    }
+    },
   ]);
-  const [value, setValue] = React.useState(0);
 
   const statDescriptionCallback = async (data) => {
     const keys = [];
     const statColumns = [];
-    console.log(data);
     statColumns.push({
       field: "id",
       headerName: "",
@@ -158,10 +153,7 @@ const Tables = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsTeamOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
@@ -178,8 +170,6 @@ const Tables = () => {
       minWidth: 70,
       flex: 0.5,
     });
-
-    console.log(data.data);
 
     for (let i = 0; i < data.data.length; i++) {
       const stat = data.data[i];
@@ -257,13 +247,13 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.sort = Number(match.match_number);
-        match.match_number = "QM-" + match.match_number
+        match.match_number = "QM-" + match.match_number;
         qual_rows.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
@@ -273,14 +263,14 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.match_key = Number(match.set_number).toFixed(0);
         match.match_number =
-        match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
+          match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
         sf_rows.push(match);
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
@@ -290,14 +280,14 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.match_key = match.match_number;
         match.match_number =
-        match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
+          match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
         f_rows.push(match);
       }
     }
@@ -311,7 +301,7 @@ const Tables = () => {
     f_rows.sort(function (a, b) {
       return a.match_key - b.match_key;
     });
-    
+
     const elim_rows = sf_rows.concat(f_rows);
 
     setQualPredictions(qual_rows);
@@ -335,7 +325,9 @@ const Tables = () => {
     const year = params[3];
     const eventKey = params[4];
 
-    setTabIndex(tabDict.indexOf(String(window.location.hash.split("#")[1])))
+    if (window.location.hash.length > 0) {
+      setTabIndex(tabDict.indexOf(String(window.location.hash.split("#")[1])));
+    }
 
     getStatDescription(year, eventKey, statDescriptionCallback);
     getRankings(year, eventKey, rankingsCallback);
@@ -380,9 +372,8 @@ const Tables = () => {
     };
   }
 
-
   const handleChange = (event, newValue) => {
-    history.push({hash: tabDict[newValue]})
+    history.push({ hash: tabDict[newValue] });
     setTabIndex(newValue);
   };
 
@@ -423,7 +414,7 @@ const Tables = () => {
                             },
                           }}
                           disableColumnMenu
-                          sortingOrder={['desc', 'asc']}
+                          sortingOrder={["desc", "asc"]}
                           rows={rankings}
                           getRowId={(row) => {
                             return row.key;

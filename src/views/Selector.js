@@ -30,7 +30,7 @@ const Selector = () => {
 
   useEffect(() => {
     const url = new URL(window.location.href);
-    const path = url.pathname.split("/")
+    const path = url.pathname.split("/");
     const urlType = path[5].split("-")[0];
     if (type !== urlType) {
       setType(urlType);
@@ -40,7 +40,7 @@ const Selector = () => {
 
   return (
     <>
-      <Header/>
+      <Header />
 
       {type === "team" && <Team />}
       {type === "match" && <Match />}

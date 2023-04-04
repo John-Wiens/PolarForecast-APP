@@ -15,14 +15,14 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getSearchKeys } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const Search = (props) => {
-  const [searchKeys, setSearchKeys] = React.useState([]);
+  const [searchKeys, setSearchKeys] = useState([]);
   const width = props.width || "300px";
 
   const searchKeyCallback = async (data) => {
@@ -35,11 +35,20 @@ const Search = (props) => {
     setSearchKeys(terms);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getSearchKeys(searchKeyCallback);
   }, []);
 
+  const darkTheme = createTheme({
+    palette: {
+      primary: {
+        main: "#00000",
+      },
+    },
+  });
+
   return (
+    <ThemeProvider theme={darkTheme}>
       <Autocomplete
         options={searchKeys ? searchKeys : []}
         loading
@@ -48,23 +57,12 @@ const Search = (props) => {
           window.location.href = newValue.page;
         }}
         sx={{
-          width: {width},
-          padding: 1
+          width: { width },
+          padding: 1,
         }}
       />
+    </ThemeProvider>
   );
 };
-
-const darkTheme = createTheme({
-  palette: {
-    type: 'light',
-    primary: {
-      main: '#3f51b5',
-    },
-    secondary: {
-      main: '#f50057',
-    },
-  },
-});
 
 export default Search;
