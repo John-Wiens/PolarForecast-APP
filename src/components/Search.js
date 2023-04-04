@@ -15,14 +15,15 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React from "react";
+import { useState, useEffect } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import { getSearchKeys } from "api.js";
-import AdminFooter from "components/Footers/AdminFooter.js";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 
-const Search = () => {
-  const [searchKeys, setSearchKeys] = React.useState([]);
+const Search = (props) => {
+  const [searchKeys, setSearchKeys] = useState([]);
+  const width = props.width || "300px";
 
   const searchKeyCallback = async (data) => {
     const terms = [];
@@ -34,29 +35,33 @@ const Search = () => {
     setSearchKeys(terms);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     getSearchKeys(searchKeyCallback);
   }, []);
 
+  const darkTheme = createTheme({
+    palette: {
+      primary: {
+        main: "#00000",
+      },
+    },
+  });
+
   return (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "center",
-        margin: 20,
-      }}
-    >
+    <ThemeProvider theme={darkTheme}>
       <Autocomplete
-        id="combo-box-demo"
         options={searchKeys ? searchKeys : []}
         loading
-        sx={{ width: 300 }}
         renderInput={(params) => <TextField {...params} label="Select An Event" />}
         onChange={(event, newValue) => {
           window.location.href = newValue.page;
         }}
+        sx={{
+          width: { width },
+          padding: 1,
+        }}
       />
-    </div>
+    </ThemeProvider>
   );
 };
 
