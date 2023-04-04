@@ -49,7 +49,6 @@
     "@mui/material": "^5.11.6",
     "@mui/x-data-grid": "^5.17.21",
     "@mui/icons-material": "5.11.9",
-    "@mui/styles": "5.11.13",
     "bootstrap": "4.6.0",
     "chart.js": "2.9.4",
     "classnames": "2.3.1",
