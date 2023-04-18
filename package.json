@@ -46,8 +46,8 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@fortawesome/fontawesome-free": "5.15.3",
-    "@mui/material": "^5.11.6",
-    "@mui/x-data-grid": "^5.17.21",
+    "@mui/material": "^5.12.1",
+    "@mui/x-data-grid": "6.2.0",
     "@mui/icons-material": "5.11.9",
     "bootstrap": "4.6.0",
     "chart.js": "2.9.4",
@@ -64,7 +64,8 @@
     "react-swipeable-views": "^0.14.0",
     "reactstrap": "8.9.0",
     "sass": "1.54.5",
-    "react-snowfall": "1.2.1"
+    "react-snowfall": "1.2.1",
+    "recharts": "2.5.0"
   },
   "devDependencies": {
     "gulp": "4.0.2",

@@ -129,7 +129,6 @@ export const getMatchPredictions = async (year, event, callback) => {
 export const getSearchKeys = async (callback) => {
   try {
     const startTime = performance.now();
-
     const data = getWithExpiry("search_keys");
     if (data === null) {
       const endpoint = `${API_ENDPOINT}/search_keys`;
@@ -141,7 +140,7 @@ export const getSearchKeys = async (callback) => {
     const timeTaken = endTime - startTime;
     
     // Log the time taken
-    console.log(`API call took ${timeTaken} milliseconds`);
+    console.log(`GetSearchKeys API call took ${timeTaken} milliseconds`);
         const data = await response.json();
         setWithExpiry("search_keys", data, default_ttl);
         callback(data);
