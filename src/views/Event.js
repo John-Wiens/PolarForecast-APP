@@ -35,16 +35,6 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import BarChartWithSwitches from "../components/BarChartWithSwitches";
 import Link from "@mui/material/Link";
 import "../assets/css/polar-css.css";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
 
 const switchTheme = createTheme({
   palette: {
@@ -75,7 +65,6 @@ const Tables = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [eventTitle, setEventTitle] = useState("");
   const [rankings, setRankings] = useState([]);
-  const [elementRankings, setElementRankings] = useState([]);
   const [qualPredictions, setQualPredictions] = useState([]);
   const [elimPredictions, setElimPredictions] = useState([]);
   const [showKeys, setShowKeys] = useState([]);
@@ -260,7 +249,6 @@ const Tables = () => {
     }
     const sortedData = [...data.data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
 
-    console.log(sortedData)
     setRankings(sortedData);
   };
 
@@ -509,12 +497,13 @@ const Tables = () => {
                   { index:3, name: "End Game", key: "endgamePoints", enabled: true},
                 ]}
               />
+              <br />
               <BarChartWithSwitches
                 data={rankings}
                 number={chartNumber}
                 startingFields={[
-                  { index:0, name: "Auto Elements", key: "teleopElementsScored", enabled: true},
-                  { index:1, name: "Teleop Elements", key: "autoElementsScored", enabled: true}
+                  { index:0, name: "Teleop Elements", key: "teleopElementsScored", enabled: true},
+                  { index:1, name: "Auto Elements", key: "autoElementsScored", enabled: true}
                 ]}
               />
             </ThemeProvider>

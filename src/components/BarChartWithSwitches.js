@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Switch, FormControlLabel } from "@mui/material";
+import { Switch, FormControlLabel, Box } from "@mui/material";
 
 const styles = {
   switchContainer: {
@@ -55,7 +55,7 @@ function BarChartWithSwitches({ data, number, startingFields }) {
   return (
     <div>
       <ResponsiveContainer width="100%" height={500}>
-        <BarChart data={chartData.slice(0, number)}>
+        <BarChart data={chartData.slice(0, number)} margin={{ top: 10, left: 0, right: 0, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="key" angle={-90} textAnchor="end" interval={0} />
           <YAxis />
@@ -74,6 +74,7 @@ function BarChartWithSwitches({ data, number, startingFields }) {
           })}
         </BarChart>
       </ResponsiveContainer>
+
       <br />
       <div style={styles.switchContainer}>
       {fields.map((item) => {

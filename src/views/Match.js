@@ -127,7 +127,6 @@ const Match = () => {
   };
 
   const matchInfoCallback = async (restData) => {
-    console.log(restData);
     setData(restData);
     let newRow = {};
     const blueAutoRows = [];
