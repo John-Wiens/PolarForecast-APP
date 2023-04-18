@@ -55,7 +55,7 @@ function BarChartWithSwitches({ data, number, startingFields }) {
   return (
     <div>
       <ResponsiveContainer width="100%" height={500}>
-        <BarChart data={chartData.slice(0, number)} margin={{ top: 10, left: 0, right: 0, bottom: 20 }}>
+        <BarChart data={chartData.slice(0, number)} margin={{ top: 10, left: -20, right: 15, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="key" angle={-90} textAnchor="end" interval={0} />
           <YAxis />
