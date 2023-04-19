@@ -27,9 +27,15 @@ const Search = (props) => {
 
   const searchKeyCallback = async (data) => {
     const terms = [];
-    for (let i = 0; i < data.data.length; i++) {
-      if ("display" in data.data[i]) {
-        terms.push({ label: String(data.data[i].display), page: data.data[i].page });
+    let array = [];
+    if (data?.data?.length > 0) {
+      array = [...data.data];
+    } else if (data?.length > 0) {
+      array = [...data];
+    }
+    for (let i = 0; i < array.length; i++) {
+      if ("display" in array[i]) {
+        terms.push({ label: String(array[i].display), page: array[i].page });
       }
     }
     setSearchKeys(terms);

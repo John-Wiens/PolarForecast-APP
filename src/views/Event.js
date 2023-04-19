@@ -155,7 +155,6 @@ const Tables = () => {
       filterable: false,
       renderCell: (index) => index.api.getRowIndexRelativeToVisibleRows(index.row.key) + 1,
       disableExport: true,
-      GridColDef: "center",
       flex: 0.1,
     });
 
@@ -165,7 +164,7 @@ const Tables = () => {
       filterable: false,
       headerAlign: "center",
       align: "center",
-      minWidth: 75,
+      minWidth: 80,
       flex: 0.5,
       renderCell: (params) => {
         const onClick = (e) => statisticsTeamOnClick(params.row);
@@ -184,7 +183,7 @@ const Tables = () => {
       sortable: true,
       headerAlign: "center",
       align: "center",
-      minWidth: 70,
+      minWidth: 80,
       flex: 0.5,
     });
 
@@ -199,7 +198,7 @@ const Tables = () => {
           sortable: true,
           headerAlign: "center",
           align: "center",
-          minWidth: 70,
+          minWidth: 80,
           flex: 0.5,
         });
       }
@@ -246,6 +245,19 @@ const Tables = () => {
           team[key] = Number(team[key]);
         }
       }
+      team["elementsLow"] = (Number(team.autoLow) + Number(team.teleopLow)).toFixed(1);
+      team["elementsMid"] = (
+        Number(team.autoMidCones) +
+        Number(team.autoMidCubes) +
+        Number(team.teleopMidCones) +
+        Number(team.teleopMidCubes)
+      ).toFixed(1);
+      team["elementsHigh"] = (
+        Number(team.autoHighCones) +
+        Number(team.autoHighCubes) +
+        Number(team.teleopHighCones) +
+        Number(team.teleopHighCubes)
+      ).toFixed(1);
     }
     const sortedData = [...data.data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
 
@@ -329,10 +341,15 @@ const Tables = () => {
   const searchKeysCallback = async (data) => {
     const url = new URL(window.location.href);
     const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4];
-
-    for (let i = 0; i < data.data.length; i++) {
-      if (data.data[i]?.key === eventName) {
-        setEventTitle(data.data[i]?.display.split("[")[0]);
+    let array = [];
+    if (data?.data?.length > 0) {
+      array = [...data.data];
+    } else if (data?.length > 0) {
+      array = [...data];
+    }
+    for (let i = 0; i < array.length; i++) {
+      if (array[i]?.key === eventName) {
+        setEventTitle(array[i]?.display.split("[")[0]);
       }
     }
   };
@@ -357,11 +374,11 @@ const Tables = () => {
     if (!isDesktop) {
       setContainerHeight(`calc(100vh - 255px)`);
       setContainerDivHeight(`calc(100vh - 185px)`);
-      setChartNumber(15);
+      setChartNumber(20);
     } else {
       setContainerHeight(`calc(100vh - 210px)`);
       setContainerDivHeight(`calc(100vh - 140px)`);
-      setChartNumber(32);
+      setChartNumber(50);
     }
   }, [isDesktop]);
 
@@ -486,15 +503,15 @@ const Tables = () => {
         </TabPanel>
         <TabPanel value={tabIndex} index={1} dir={darkTheme.direction}>
           <div style={{ height: containerDivHeight, width: "100%" }}>
-            <ThemeProvider theme={switchTheme} >
+            <ThemeProvider theme={switchTheme}>
               <BarChartWithSwitches
                 data={rankings}
                 number={chartNumber}
                 startingFields={[
-                  { index:0, name: "Auto", key: "autoPoints", enabled: true},
-                  { index:1, name: "Teleop", key: "teleopPoints", enabled: true},
-                  { index:2, name: "Links", key: "linkPoints", enabled: true},
-                  { index:3, name: "End Game", key: "endgamePoints", enabled: true},
+                  { index: 0, name: "Auto", key: "autoPoints", enabled: true },
+                  { index: 1, name: "Teleop", key: "teleopPoints", enabled: true },
+                  { index: 2, name: "Links", key: "linkPoints", enabled: true },
+                  { index: 3, name: "End Game", key: "endgamePoints", enabled: true },
                 ]}
               />
               <br />
@@ -502,8 +519,18 @@ const Tables = () => {
                 data={rankings}
                 number={chartNumber}
                 startingFields={[
-                  { index:0, name: "Teleop Elements", key: "teleopElementsScored", enabled: true},
-                  { index:1, name: "Auto Elements", key: "autoElementsScored", enabled: true}
+                  { index: 0, name: "Teleop Elements", key: "teleopElementsScored", enabled: true },
+                  { index: 1, name: "Auto Elements", key: "autoElementsScored", enabled: true },
+                ]}
+              />
+              <br />
+              <BarChartWithSwitches
+                data={rankings}
+                number={chartNumber}
+                startingFields={[
+                  { index: 0, name: "Low", key: "elementsLow", enabled: true },
+                  { index: 1, name: "Middle", key: "elementsMid", enabled: true },
+                  { index: 2, name: "High", key: "elementsHigh", enabled: true },
                 ]}
               />
             </ThemeProvider>

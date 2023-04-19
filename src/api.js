@@ -22,9 +22,8 @@ function getWithExpiry(key) {
   const now = new Date();
   // compare the expiry time of the item with the current time
   if (now.getTime() > item.expiry) {
-    console.log("Clearing Local Storage");
-    localStorage.clear();
-    getSearchKeys(() => {})
+    localStorage.removeItem(key);
+    getSearchKeys(() => {});
     return null;
   }
   return JSON.parse(item.value);
@@ -135,14 +134,11 @@ export const getSearchKeys = async (callback) => {
       console.log("Requesting Data from: " + endpoint);
       const response = await fetch(endpoint);
       if (response.ok) {
+        const { data } = await response.json();
         const endTime = performance.now();
-        // Calculate the time taken
-    const timeTaken = endTime - startTime;
-    
-    // Log the time taken
-    console.log(`GetSearchKeys API call took ${timeTaken} milliseconds`);
-        const data = await response.json();
-        setWithExpiry("search_keys", data, default_ttl);
+        const timeTaken = endTime - startTime;
+        console.log(`GetSearchKeys API call took ${timeTaken} milliseconds`);
+        setWithExpiry("search_keys", data, 30);
         callback(data);
       } else {
         callback({ data: [] });
