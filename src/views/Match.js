@@ -23,10 +23,14 @@ import { getMatchDetails } from "api.js";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
-import Link from '@mui/material/Link';
+import Link from "@mui/material/Link";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import Box from "@mui/material/Box";
+import "../assets/css/polar-css.css";
+import { IconButton } from "@mui/material";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 const Match = () => {
   const history = useHistory();
@@ -34,6 +38,7 @@ const Match = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [matchTitle, setMatchTitle] = useState(false);
+  const [matchNumber, setMatchNumber] = useState();
   const [bluePrediction, setBluePrediction] = useState(false);
   const [blueResult, setBlueResult] = useState(false);
   const [redPrediction, setRedPrediction] = useState(false);
@@ -55,12 +60,11 @@ const Match = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsTeamOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
-            {params.value}
-          </Link>
+          <div>
+            <Link component="button" onClick={onClick} underline="always">
+              {params.value}
+            </Link>
+          </div>
         );
       },
     },
@@ -81,6 +85,7 @@ const Match = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
+      minWidth: 75,
     },
     {
       field: "teleop_score",
@@ -99,11 +104,26 @@ const Match = () => {
       headerAlign: "center",
       align: "center",
       flex: 0.5,
-    }
+      minWidth: 100,
+    },
+    {
+      field: "OPR",
+      headerName: "OPR",
+      filterable: false,
+      disableExport: true,
+      headerAlign: "center",
+      align: "center",
+      flex: 0.3,
+    },
   ]);
 
   const statisticsTeamOnClick = (cellValues) => {
     history.push("team-" + cellValues.team);
+  };
+
+  const rightOnClick = (cellValues) => {
+    console.log(matchNumber);
+    // history.push("team-" + cellValues.team);
   };
 
   const matchInfoCallback = async (restData) => {
@@ -151,6 +171,7 @@ const Match = () => {
       newRow = {
         key: i,
         team: team.key.replace("frc", ""),
+        OPR: team.OPR.toFixed(1),
         auto_score: team.autoPoints.toFixed(1),
         auto_charge_station: team.autoChargeStation.toFixed(1),
         teleop_score: team.teleopPoints.toFixed(1),
@@ -212,7 +233,8 @@ const Match = () => {
     const year = params[3];
     const eventKey = params[4];
     const match = params[5].split("-")[1];
-    
+    setMatchNumber(match);
+
     getMatchDetails(year, eventKey, match, matchInfoCallback);
   }, []);
 
@@ -223,11 +245,18 @@ const Match = () => {
           <Container>
             <Row>
               <div style={{ width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
-                  <CardHeader className="bg-transparent">
-                    <h1 className="text-white mb-0">Match {matchTitle}</h1>
-                    {/* <h3 className="text-white mb-0">Prediction: {matchPrediction}</h3>
-                    {matchResult && <h3 className="text-white mb-0">Result: {matchResult}</h3>} */}
+                <Card className="polar-box">
+                  <CardHeader className="bg-transparent" style={{ textAlign: "center", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                      {/* {matchNumber.split("_").length } */}
+                      {/* <IconButton>
+                        <ArrowLeftIcon />
+                      </IconButton> */}
+                      <h1 className="text-white mb-0">Match {matchTitle}</h1>
+                      {/* <IconButton>
+                        <ArrowRightIcon 
+                          onClick={rightOnClick}
+                        />
+                      </IconButton> */}
                   </CardHeader>
                 </Card>
               </div>
@@ -235,7 +264,7 @@ const Match = () => {
 
             <Row>
               <div style={{ width: "100%" }}>
-                <Card className="bg-gradient-default shadow">
+                <Card className="polar-box">
                   <CardHeader className="bg-transparent">
                     <h3 style={{ color: "#90caf9" }}>
                       {blueWinner && <EmojiEventsIcon />}Blue Alliance
@@ -243,7 +272,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {bluePrediction}</h4>
                     {blueResult && <h4 className="text-white mb-0">Result: {blueResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "250px", width: "100%" }}>
+                  <div style={{ height: "200px", width: "100%" }}>
                     {blueRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -252,9 +281,11 @@ const Match = () => {
                           return row.key;
                         }}
                         columns={columns}
+                        hideFooter
                         pageSize={100}
                         rowsPerPageOptions={[100]}
-                        rowHeight={35}
+                        rowHeight={30}
+                        options={{ pagination: false }}
                         sx={{
                           mx: 0.5,
                           border: 0,
@@ -281,7 +312,7 @@ const Match = () => {
                     )}
                   </div>
                 </Card>
-                <Card className="bg-gradient-default shadow">
+                <Card className="polar-box">
                   <CardHeader className="bg-transparent">
                     <h3 style={{ color: "#FF0000" }}>
                       {redWinner && <EmojiEventsIcon />}Red Alliance
@@ -289,7 +320,7 @@ const Match = () => {
                     <h4 className="text-white mb-0">Prediction: {redPrediction}</h4>
                     {redResult && <h4 className="text-white mb-0">Result: {redResult}</h4>}
                   </CardHeader>
-                  <div style={{ height: "250px", width: "100%" }}>
+                  <div style={{ height: "200px", width: "100%" }}>
                     {redRows.length > 0 ? (
                       <StripedDataGrid
                         disableColumnMenu
@@ -300,7 +331,8 @@ const Match = () => {
                         columns={columns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
-                        rowHeight={35}
+                        rowHeight={30}
+                        hideFooter
                         sx={{
                           mx: 0.5,
                           border: 0,

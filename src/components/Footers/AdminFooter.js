@@ -18,7 +18,7 @@
 /*eslint-disable*/
 
 // reactstrap components
-import { Container, Row, Col, Nav, NavItem, NavLink } from "reactstrap";
+import { Row, Col} from "reactstrap";
 
 const Footer = () => {
   return (
@@ -32,8 +32,7 @@ const Footer = () => {
               href="https://www.creative-tim.com?ref=adr-admin-footer"
               rel="noopener noreferrer"
               target="_blank"
-            >
-            </a>
+            ></a>
           </div>
         </Col>
       </Row>

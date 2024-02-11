@@ -16,7 +16,8 @@
 
 */
 import { Card, CardHeader, Container, Row } from "reactstrap";
-import { alpha, styled } from "@mui/material/styles";
+import { useMediaQuery, useTheme } from "@mui/material";
+import { alpha, styled, ThemeProvider, createTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -25,28 +26,43 @@ import Box from "@mui/material/Box";
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarColumnsButton,
-  GridToolbarExport,
-  gridClasses,
-} from "@mui/x-data-grid";
+import { DataGrid, gridClasses, GridToolbar } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
 import Stack from "@mui/material/Stack";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import InfoIcon from "@mui/icons-material/Info";
-import { IconButton } from "@mui/material";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import Link from '@mui/material/Link';
+import BarChartWithSwitches from "../components/BarChartWithSwitches";
+import Link from "@mui/material/Link";
 import "../assets/css/polar-css.css";
+
+const switchTheme = createTheme({
+  palette: {
+    primary: {
+      main: "#4D9DE0",
+    },
+    secondary: {
+      main: "#E15554",
+    },
+    tertiary: {
+      main: "#7768AE",
+    },
+    quaternary: {
+      main: "#3BB273",
+    },
+  },
+});
 
 const Tables = () => {
   const history = useHistory();
-
+  const tabDict = ["rankings", "charts", "quals", "elims"];
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
+  const [containerHeight, setContainerHeight] = useState(`calc(100vh - 200px)`);
+  const [containerDivHeight, setContainerDivHeight] = useState(`calc(100vh - 250px)`);
+  const [chartNumber, setChartNumber] = useState(32);
   const [statDescription, setStatDescription] = useState([]);
+  const [tabIndex, setTabIndex] = useState(0);
   const [eventTitle, setEventTitle] = useState("");
   const [rankings, setRankings] = useState([]);
   const [qualPredictions, setQualPredictions] = useState([]);
@@ -65,10 +81,7 @@ const Tables = () => {
       renderCell: (params) => {
         const onClick = (e) => statisticsMatchOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
@@ -93,7 +106,9 @@ const Tables = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if ("blue_actual_score" in params.row){ showTrophy = true; }
+        if ("blue_actual_score" in params.row) {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) > parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="primary">
@@ -115,7 +130,9 @@ const Tables = () => {
       flex: 0.5,
       renderCell: (params) => {
         let showTrophy = false;
-        if ("red_actual_score" in params.row){ showTrophy = true; }
+        if ("red_actual_score" in params.row) {
+          showTrophy = true;
+        }
         if (parseFloat(params.row.blue_score) < parseFloat(params.row.red_score)) {
           return (
             <Typography fontWeight="bold" color="#FF0000">
@@ -126,21 +143,18 @@ const Tables = () => {
           return <Typography color="#FFFFFF"> {params.value}</Typography>;
         }
       },
-    }
+    },
   ]);
-  const [value, setValue] = React.useState(0);
 
   const statDescriptionCallback = async (data) => {
     const keys = [];
     const statColumns = [];
-
     statColumns.push({
       field: "id",
       headerName: "",
       filterable: false,
-      renderCell: (index) => index.api.getRowIndex(index.row.key) + 1,
+      renderCell: (index) => index.api.getRowIndexRelativeToVisibleRows(index.row.key) + 1,
       disableExport: true,
-      GridColDef: "center",
       flex: 0.1,
     });
 
@@ -150,24 +164,32 @@ const Tables = () => {
       filterable: false,
       headerAlign: "center",
       align: "center",
-      minWidth: 75,
+      minWidth: 80,
       flex: 0.5,
       renderCell: (params) => {
         const onClick = (e) => statisticsTeamOnClick(params.row);
         return (
-          <Link 
-            component="button"
-            onClick={onClick}
-            underline="always">
+          <Link component="button" onClick={onClick} underline="always">
             {params.value}
           </Link>
         );
       },
     });
 
+    statColumns.push({
+      field: "OPR",
+      headerName: "OPR",
+      type: "number",
+      sortable: true,
+      headerAlign: "center",
+      align: "center",
+      minWidth: 80,
+      flex: 0.5,
+    });
+
     for (let i = 0; i < data.data.length; i++) {
       const stat = data.data[i];
-      if (stat.report_stat) {
+      if (stat.report_stat && stat.stat_key !== "OPR") {
         keys.push(stat.stat_key);
         statColumns.push({
           field: stat.stat_key,
@@ -176,12 +198,11 @@ const Tables = () => {
           sortable: true,
           headerAlign: "center",
           align: "center",
-          minWidth: 70,
+          minWidth: 80,
           flex: 0.5,
         });
       }
     }
-
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
@@ -224,8 +245,23 @@ const Tables = () => {
           team[key] = Number(team[key]);
         }
       }
+      team["elementsLow"] = (Number(team.autoLow) + Number(team.teleopLow)).toFixed(1);
+      team["elementsMid"] = (
+        Number(team.autoMidCones) +
+        Number(team.autoMidCubes) +
+        Number(team.teleopMidCones) +
+        Number(team.teleopMidCubes)
+      ).toFixed(1);
+      team["elementsHigh"] = (
+        Number(team.autoHighCones) +
+        Number(team.autoHighCubes) +
+        Number(team.teleopHighCones) +
+        Number(team.teleopHighCubes)
+      ).toFixed(1);
     }
-    setRankings(data.data);
+    const sortedData = [...data.data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
+
+    setRankings(sortedData);
   };
 
   const predictionsCallback = async (data) => {
@@ -241,13 +277,13 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.sort = Number(match.match_number);
-        match.match_number = "QM-" + match.match_number
+        match.match_number = "QM-" + match.match_number;
         qual_rows.push(match);
       } else if (match.comp_level === "sf") {
         for (const [key, value] of Object.entries(match)) {
@@ -257,14 +293,14 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.match_key = Number(match.set_number).toFixed(0);
         match.match_number =
-        match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
+          match.comp_level.toUpperCase() + "-" + Number(match.set_number).toFixed(0);
         sf_rows.push(match);
       } else if (match.comp_level === "f") {
         for (const [key, value] of Object.entries(match)) {
@@ -274,14 +310,14 @@ const Tables = () => {
         }
         if ("blue_actual_score" in match) {
           match.data_type = "Result";
-          match.blue_score = match.blue_actual_score
-          match.red_score = match.red_actual_score
+          match.blue_score = match.blue_actual_score;
+          match.red_score = match.red_actual_score;
         } else {
           match.data_type = "Predicted";
         }
         match.match_key = match.match_number;
         match.match_number =
-        match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
+          match.comp_level.toUpperCase() + "-" + Number(match.match_number).toFixed(0);
         f_rows.push(match);
       }
     }
@@ -295,7 +331,7 @@ const Tables = () => {
     f_rows.sort(function (a, b) {
       return a.match_key - b.match_key;
     });
-    
+
     const elim_rows = sf_rows.concat(f_rows);
 
     setQualPredictions(qual_rows);
@@ -305,10 +341,15 @@ const Tables = () => {
   const searchKeysCallback = async (data) => {
     const url = new URL(window.location.href);
     const eventName = url.pathname.split("/")[3] + url.pathname.split("/")[4];
-
-    for (let i = 0; i < data.data.length; i++) {
-      if (data.data[i]?.key === eventName) {
-        setEventTitle(data.data[i]?.display.split("[")[0]);
+    let array = [];
+    if (data?.data?.length > 0) {
+      array = [...data.data];
+    } else if (data?.length > 0) {
+      array = [...data];
+    }
+    for (let i = 0; i < array.length; i++) {
+      if (array[i]?.key === eventName) {
+        setEventTitle(array[i]?.display.split("[")[0]);
       }
     }
   };
@@ -319,22 +360,27 @@ const Tables = () => {
     const year = params[3];
     const eventKey = params[4];
 
+    if (window.location.hash.length > 0) {
+      setTabIndex(tabDict.indexOf(String(window.location.hash.split("#")[1])));
+    }
+
     getStatDescription(year, eventKey, statDescriptionCallback);
     getRankings(year, eventKey, rankingsCallback);
     getMatchPredictions(year, eventKey, predictionsCallback);
     getSearchKeys(searchKeysCallback);
   }, []);
 
-  function customToolbar() {
-    return (
-      <div className="text-white mb-0">
-        <GridToolbarContainer className="text-white mb-0">
-          <GridToolbarColumnsButton />
-          <GridToolbarExport />
-        </GridToolbarContainer>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!isDesktop) {
+      setContainerHeight(`calc(100vh - 255px)`);
+      setContainerDivHeight(`calc(100vh - 185px)`);
+      setChartNumber(20);
+    } else {
+      setContainerHeight(`calc(100vh - 210px)`);
+      setContainerDivHeight(`calc(100vh - 140px)`);
+      setChartNumber(50);
+    }
+  }, [isDesktop]);
 
   function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -348,7 +394,13 @@ const Tables = () => {
       >
         {value === index && (
           <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 210px)" }}>
-            <Typography>{children}</Typography>
+            <ThemeProvider theme={darkTheme}>
+              <Container>
+                <Row>
+                  <div style={{ height: containerHeight, width: "100%" }}>{children}</div>
+                </Row>
+              </Container>
+            </ThemeProvider>
           </Box>
         )}
       </div>
@@ -363,7 +415,8 @@ const Tables = () => {
   }
 
   const handleChange = (event, newValue) => {
-    setValue(newValue);
+    history.push({ hash: tabDict[newValue] });
+    setTabIndex(newValue);
   };
 
   return (
@@ -371,7 +424,7 @@ const Tables = () => {
       <Header />
       <AppBar position="static">
         <Tabs
-          value={value}
+          value={tabIndex}
           onChange={handleChange}
           indicatorColor="secondary"
           textColor="inherit"
@@ -379,170 +432,189 @@ const Tables = () => {
           aria-label="full width tabs"
         >
           <Tab label="Rankings" {...a11yProps(0)} />
-          {qualPredictions.length > 0 && <Tab label="Quals" {...a11yProps(1)} />}
-          {elimPredictions.length > 0 && <Tab label="Elims" {...a11yProps(2)} />}
+          <Tab label="Charts" {...a11yProps(1)} />
+          {qualPredictions.length > 0 && <Tab label="Quals" {...a11yProps(2)} />}
+          {elimPredictions.length > 0 && <Tab label="Elims" {...a11yProps(3)} />}
           {/* <Tab label="Polar Power" {...a11yProps(2)} /> */}
         </Tabs>
       </AppBar>
-      <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
-        <TabPanel value={value} index={0} dir={darkTheme.direction}>
-          <ThemeProvider theme={darkTheme}>
-            <Container>
-              <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
-                    </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                      {rankings.length > 0 ? (
-                        <StripedDataGrid
-                          initialState={{
-                            sorting: {
-                              sortModel: [{ field: "OPR", sort: "desc" }],
-                            },
-                          }}
-                          disableColumnMenu
-                          rows={rankings}
-                          getRowId={(row) => {
-                            return row.key;
-                          }}
-                          columns={statColumns}
-                          pageSize={100}
-                          rowsPerPageOptions={[100]}
-                          rowHeight={35}
-                          components={{
-                            Toolbar: customToolbar,
-                            NoRowsOverlay: () => (
-                              <Stack height="100%" alignItems="center" justifyContent="center">
-                                No Match Data
-                              </Stack>
-                            ),
-                          }}
-                          sx={{
-                            mx: 0.5,
-                            border: 0,
-                            borderColor: "white",
-                            "& .MuiDataGrid-cell:hover": {
-                              color: "white",
-                            },
-                          }}
-                          getRowClassName={(params) =>
-                            params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-                          }
-                        />
-                      ) : (
-                        <Box
-                          sx={{
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center",
-                            minHeight: "calc(100vh - 300px)",
-                          }}
-                        >
-                          <CircularProgress />
-                        </Box>
-                      )}
-                    </div>
-                  </Card>
-                </div>
-              </Row>
-            </Container>
-          </ThemeProvider>
+      <div style={{ height: containerDivHeight, width: "100%", overflow: "auto" }}>
+        <TabPanel value={tabIndex} index={0} dir={darkTheme.direction}>
+          <Card className="polar-box">
+            <CardHeader className="bg-transparent">
+              <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
+            </CardHeader>
+            <div style={{ height: containerHeight, width: "100%" }}>
+              {rankings.length > 0 ? (
+                <StripedDataGrid
+                  initialState={{
+                    sorting: {
+                      sortModel: [{ field: "OPR", sort: "desc" }],
+                      pagination: { paginationModel: { pageSize: 50 } },
+                    },
+                  }}
+                  disableColumnMenu
+                  sortingOrder={["desc", "asc"]}
+                  rows={rankings}
+                  getRowId={(row) => {
+                    return row.key;
+                  }}
+                  columns={statColumns}
+                  pageSize={100}
+                  rowsPerPageOptions={[100]}
+                  rowHeight={35}
+                  slots={{ toolbar: GridToolbar }}
+                  slotProps={{
+                    toolbar: {
+                      showQuickFilter: true,
+                      quickFilterProps: { debounceMs: 500 },
+                    },
+                  }}
+                  disableColumnFilter={!isDesktop}
+                  disableColumnSelector={!isDesktop}
+                  disableDensitySelector={!isDesktop}
+                  disableExportSelector={!isDesktop}
+                  sx={{
+                    mx: 0.5,
+                    border: 0,
+                    borderColor: "white",
+                    "& .MuiDataGrid-cell:hover": {
+                      color: "white",
+                    },
+                  }}
+                  getRowClassName={(params) =>
+                    params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                  }
+                />
+              ) : (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: "calc(100vh - 300px)",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              )}
+            </div>
+          </Card>
         </TabPanel>
-        <TabPanel value={value} index={1} dir={darkTheme.direction}>
-          <ThemeProvider theme={darkTheme}>
-            <Container>
-              <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Qualifications Predictions - {eventTitle}</h3>
-                    </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                      <StripedDataGrid
-                        disableColumnMenu
-                        rows={qualPredictions}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        columns={matchPredictionColumns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
-                        rowHeight={35}
-                        disableExtendRowFullWidth={true}
-                        sx={{
-                          boxShadow: 2,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
-                        }}
-                        components={{
-                          NoRowsOverlay: () => (
-                            <Stack height="100%" alignItems="center" justifyContent="center">
-                              No Match Data
-                            </Stack>
-                          ),
-                        }}
-                        getRowClassName={(params) =>
-                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-                        }
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </Row>
-            </Container>
-          </ThemeProvider>
+        <TabPanel value={tabIndex} index={1} dir={darkTheme.direction}>
+          <div style={{ height: containerDivHeight, width: "100%" }}>
+            <ThemeProvider theme={switchTheme}>
+              <BarChartWithSwitches
+                data={rankings}
+                number={chartNumber}
+                startingFields={[
+                  { index: 0, name: "Auto", key: "autoPoints", enabled: true },
+                  { index: 1, name: "Teleop", key: "teleopPoints", enabled: true },
+                  { index: 2, name: "Links", key: "linkPoints", enabled: true },
+                  { index: 3, name: "End Game", key: "endgamePoints", enabled: true },
+                ]}
+              />
+              <br />
+              <BarChartWithSwitches
+                data={rankings}
+                number={chartNumber}
+                startingFields={[
+                  { index: 0, name: "Teleop Elements", key: "teleopElementsScored", enabled: true },
+                  { index: 1, name: "Auto Elements", key: "autoElementsScored", enabled: true },
+                ]}
+              />
+              <br />
+              <BarChartWithSwitches
+                data={rankings}
+                number={chartNumber}
+                startingFields={[
+                  { index: 0, name: "Low", key: "elementsLow", enabled: true },
+                  { index: 1, name: "Middle", key: "elementsMid", enabled: true },
+                  { index: 2, name: "High", key: "elementsHigh", enabled: true },
+                ]}
+              />
+            </ThemeProvider>
+          </div>
         </TabPanel>
-        <TabPanel value={value} index={2} dir={darkTheme.direction}>
-          <ThemeProvider theme={darkTheme}>
-            <Container>
-              <Row>
-                <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                  <Card className="bg-gradient-default shadow">
-                    <CardHeader className="bg-transparent">
-                      <h3 className="text-white mb-0">Eliminations Predictions - {eventTitle}</h3>
-                    </CardHeader>
-                    <div style={{ height: "calc(100vh - 280px)", width: "100%" }}>
-                      <StripedDataGrid
-                        disableColumnMenu
-                        rows={elimPredictions}
-                        getRowId={(row) => {
-                          return row.key;
-                        }}
-                        columns={matchPredictionColumns}
-                        pageSize={100}
-                        rowsPerPageOptions={[100]}
-                        rowHeight={35}
-                        disableExtendRowFullWidth={true}
-                        sx={{
-                          boxShadow: 2,
-                          border: 0,
-                          borderColor: "white",
-                          "& .MuiDataGrid-cell:hover": {
-                            color: "white",
-                          },
-                        }}
-                        components={{
-                          NoRowsOverlay: () => (
-                            <Stack height="100%" alignItems="center" justifyContent="center">
-                              No Match Data
-                            </Stack>
-                          ),
-                        }}
-                        getRowClassName={(params) =>
-                          params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
-                        }
-                      />
-                    </div>
-                  </Card>
-                </div>
-              </Row>
-            </Container>
-          </ThemeProvider>
+        <TabPanel value={tabIndex} index={2} dir={darkTheme.direction}>
+          <div style={{ height: containerHeight, width: "100%" }}>
+            <Card className="polar-box">
+              <CardHeader className="bg-transparent">
+                <h3 className="text-white mb-0">Qualifications - {eventTitle}</h3>
+              </CardHeader>
+              <div style={{ height: containerHeight, width: "100%" }}>
+                <StripedDataGrid
+                  disableColumnMenu
+                  rows={qualPredictions}
+                  getRowId={(row) => {
+                    return row.key;
+                  }}
+                  columns={matchPredictionColumns}
+                  pageSize={100}
+                  rowsPerPageOptions={[100]}
+                  rowHeight={35}
+                  disableExtendRowFullWidth={true}
+                  sx={{
+                    boxShadow: 2,
+                    border: 0,
+                    borderColor: "white",
+                    "& .MuiDataGrid-cell:hover": {
+                      color: "white",
+                    },
+                  }}
+                  components={{
+                    NoRowsOverlay: () => (
+                      <Stack height="100%" alignItems="center" justifyContent="center">
+                        No Match Data
+                      </Stack>
+                    ),
+                  }}
+                  getRowClassName={(params) =>
+                    params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                  }
+                />
+              </div>
+            </Card>
+          </div>
+        </TabPanel>
+        <TabPanel value={tabIndex} index={3} dir={darkTheme.direction}>
+          <Card className="polar-box">
+            <CardHeader className="bg-transparent">
+              <h3 className="text-white mb-0">Eliminations - {eventTitle}</h3>
+            </CardHeader>
+            <div style={{ height: containerHeight, width: "100%" }}>
+              <StripedDataGrid
+                disableColumnMenu
+                rows={elimPredictions}
+                getRowId={(row) => {
+                  return row.key;
+                }}
+                columns={matchPredictionColumns}
+                pageSize={100}
+                rowsPerPageOptions={[100]}
+                rowHeight={35}
+                disableExtendRowFullWidth={true}
+                sx={{
+                  boxShadow: 2,
+                  border: 0,
+                  borderColor: "white",
+                  "& .MuiDataGrid-cell:hover": {
+                    color: "white",
+                  },
+                }}
+                components={{
+                  NoRowsOverlay: () => (
+                    <Stack height="100%" alignItems="center" justifyContent="center">
+                      No Match Data
+                    </Stack>
+                  ),
+                }}
+                getRowClassName={(params) =>
+                  params.indexRelativeToCurrentPage % 2 === 0 ? "even" : "odd"
+                }
+              />
+            </div>
+          </Card>
         </TabPanel>
       </div>
       <Snowfall
