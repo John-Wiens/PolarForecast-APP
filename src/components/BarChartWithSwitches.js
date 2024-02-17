@@ -77,9 +77,10 @@ function BarChartWithSwitches({ data, number, startingFields }) {
 
       <br />
       <div style={styles.switchContainer}>
-      {fields.map((item) => {
+      {fields.map((item, index) => {
         return (
           <FormControlLabel
+            key={index}
             control={
               <Switch
                 name={item.key}
