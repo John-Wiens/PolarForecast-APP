@@ -19,7 +19,7 @@ import { Card, CardHeader, Container, Row } from "reactstrap";
 import { useHistory } from "react-router-dom";
 import { alpha, styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
-import { getMatchDetails } from "api.js";
+import { getMatchDetails, getStatDescription } from "api.js";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
@@ -48,151 +48,19 @@ const Match = () => {
   const [redRows, setRedRows] = useState([]);
   const [blueWinner, setBlueWinner] = useState(false);
   const [redWinner, setRedWinner] = useState(false);
-  const [columns, setColumns] = useState([
-    {
-      field: "team",
-      headerName: "Team",
-      sortable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      renderCell: (params) => {
-        const onClick = (e) => statisticsTeamOnClick(params.row);
-        return (
-          <div>
-            <Link component="button" onClick={onClick} underline="always">
-              {params.value}
-            </Link>
-          </div>
-        );
-      },
-    },
-    {
-      field: "auto_score",
-      headerName: "Auto",
-      filterable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-    },
-    {
-      field: "auto_charge_station",
-      headerName: "Auto CS",
-      filterable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 75,
-    },
-    {
-      field: "teleop_score",
-      headerName: "Teleop",
-      filterable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-    },
-    {
-      field: "end_game",
-      headerName: "End Game",
-      filterable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.5,
-      minWidth: 100,
-    },
-    {
-      field: "OPR",
-      headerName: "OPR",
-      filterable: false,
-      disableExport: true,
-      headerAlign: "center",
-      align: "center",
-      flex: 0.3,
-    },
-  ]);
+  const [showKeys, setShowKeys] = useState([]);
+  const [statColumns, setStatColumns] = useState([]);
 
   const statisticsTeamOnClick = (cellValues) => {
     history.push("team-" + cellValues.team);
   };
 
-  const rightOnClick = (cellValues) => {
-    console.log(matchNumber);
-    // history.push("team-" + cellValues.team);
-  };
-
   const matchInfoCallback = async (restData) => {
     setData(restData);
-    let newRow = {};
-    const blueAutoRows = [];
-    let i = 0;
-    let blueAutoScore = 0;
-    let blueChargeStation = 0;
-    let blueTeleop = 0;
-    for (const team of restData?.blue_teams) {
-      newRow = {
-        key: i,
-        team: team.key.replace("frc", ""),
-        OPR: team.OPR.toFixed(1),
-        auto_score: team.autoPoints.toFixed(1),
-        auto_charge_station: team.autoChargeStation.toFixed(1),
-        teleop_score: team.teleopPoints.toFixed(1),
-        end_game: team.endgamePoints.toFixed(1),
-      };
-      blueAutoRows.push(newRow);
-      i = i + 1;
-      blueAutoScore = blueAutoScore + team.autoPoints;
-      blueChargeStation = blueChargeStation + team.autoChargeStation;
-      blueTeleop = blueTeleop + team.teleopPoints;
-    }
-    newRow = {
-      key: 4,
-      team: "",
-      auto_score: blueAutoScore?.toFixed(1),
-      auto_charge_station: blueChargeStation?.toFixed(1),
-      teleop_score: blueTeleop?.toFixed(1),
-      end_game: restData?.prediction.blue_endGame?.toFixed(1),
-    };
-    blueAutoRows.push(newRow);
+    console.debug(restData);
 
-    setBlueRows(blueAutoRows);
-
-    const redAutoRows = [];
-    i = 0;
-    let redAutoScore = 0;
-    let redChargeStation = 0;
-    let redTeleop = 0;
-    for (const team of restData?.red_teams) {
-      newRow = {
-        key: i,
-        team: team.key.replace("frc", ""),
-        OPR: team.OPR.toFixed(1),
-        auto_score: team.autoPoints.toFixed(1),
-        auto_charge_station: team.autoChargeStation.toFixed(1),
-        teleop_score: team.teleopPoints.toFixed(1),
-        end_game: team.endgamePoints.toFixed(1),
-      };
-      redAutoRows.push(newRow);
-      i = i + 1;
-      redAutoScore = redAutoScore + team.autoPoints;
-      redChargeStation = redChargeStation + team.autoChargeStation;
-      redTeleop = redTeleop + team.teleopPoints;
-    }
-    newRow = {
-      key: 4,
-      team: "",
-      auto_score: redAutoScore?.toFixed(1),
-      auto_charge_station: redChargeStation?.toFixed(1),
-      teleop_score: redTeleop?.toFixed(1),
-      end_game: restData?.prediction.red_endGame?.toFixed(1),
-    };
-    redAutoRows.push(newRow);
-    setRedRows(redAutoRows);
+    setBlueRows(restData?.blue_teams);
+    setRedRows(restData?.red_teams);
 
     if (restData?.match.winning_alliance === "red") {
       setRedWinner(true);
@@ -227,6 +95,53 @@ const Match = () => {
     setLoading(false);
   };
 
+  const statDescriptionCallback = async (data) => {
+    // Main event table
+    const keys = [];
+    const statColumns = [];
+
+    statColumns.push({
+      field: "key",
+      headerName: "Team",
+      filterable: false,
+      headerAlign: "center",
+      align: "center",
+      minWidth: 80,
+      flex: 0.5,
+      renderCell: (params) => {
+        const onClick = (e) => statisticsTeamOnClick(params.row);
+        return (
+          <Link component="button" onClick={onClick} underline="always">
+            {params.value}
+          </Link>
+        );
+      },
+    });
+
+    const mainColumnData = data.data.filter(item => item.report_stat);
+    
+    mainColumnData.sort((a, b) => a.order - b.order);
+    console.debug(mainColumnData)
+
+    for (let i = 0; i < mainColumnData.length; i++) {
+      const stat = mainColumnData[i];
+      keys.push(stat.stat_key);
+      statColumns.push({
+        field: stat.stat_key,
+        headerName: stat.display_name,
+        type: "number",
+        sortable: true,
+        headerAlign: "center",
+        align: "center",
+        minWidth: 80,
+        flex: 0.5,
+      });
+    }
+
+    setShowKeys(keys);
+    setStatColumns(statColumns);
+  };
+
   useEffect(() => {
     const url = new URL(window.location.href);
     const params = url.pathname.split("/");
@@ -235,6 +150,7 @@ const Match = () => {
     const match = params[5].split("-")[1];
     setMatchNumber(match);
 
+    getStatDescription(year, eventKey, statDescriptionCallback);
     getMatchDetails(year, eventKey, match, matchInfoCallback);
   }, []);
 
@@ -280,7 +196,7 @@ const Match = () => {
                         getRowId={(row) => {
                           return row.key;
                         }}
-                        columns={columns}
+                        columns={statColumns}
                         hideFooter
                         pageSize={100}
                         rowsPerPageOptions={[100]}
@@ -328,7 +244,7 @@ const Match = () => {
                         getRowId={(row) => {
                           return row.key;
                         }}
-                        columns={columns}
+                        columns={statColumns}
                         pageSize={100}
                         rowsPerPageOptions={[100]}
                         rowHeight={30}
