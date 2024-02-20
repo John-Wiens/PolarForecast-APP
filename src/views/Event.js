@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import { Card, CardHeader, Container, Row } from "reactstrap";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { alpha, styled, ThemeProvider, createTheme } from "@mui/material/styles";
@@ -35,6 +18,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import BarChartWithSwitches from "../components/BarChartWithSwitches";
 import Link from "@mui/material/Link";
 import "../assets/css/polar-css.css";
+import { Grid } from '@mui/material';
 
 const switchTheme = createTheme({
   palette: {
@@ -69,6 +53,7 @@ const Tables = () => {
   const [elimPredictions, setElimPredictions] = useState([]);
   const [showKeys, setShowKeys] = useState([]);
   const [statColumns, setStatColumns] = useState([]);
+  const [chartColumnList, setChartColumnList] = useState([]);
   const [matchPredictionColumns, setMatchPredictionColumns] = useState([
     {
       field: "match_number",
@@ -147,6 +132,7 @@ const Tables = () => {
   ]);
 
   const statDescriptionCallback = async (data) => {
+    // Main event table
     const keys = [];
     const statColumns = [];
     statColumns.push({
@@ -176,36 +162,53 @@ const Tables = () => {
       },
     });
 
-    statColumns.push({
-      field: "OPR",
-      headerName: "OPR",
-      type: "number",
-      sortable: true,
-      headerAlign: "center",
-      align: "center",
-      minWidth: 80,
-      flex: 0.5,
-    });
+    const mainColumnData = data.data.filter(item => item.report_stat);
+    
+    mainColumnData.sort((a, b) => a.order - b.order);
+    console.debug(mainColumnData)
 
-    for (let i = 0; i < data.data.length; i++) {
-      const stat = data.data[i];
-      if (stat.report_stat && stat.stat_key !== "OPR") {
-        keys.push(stat.stat_key);
-        statColumns.push({
-          field: stat.stat_key,
-          headerName: stat.display_name,
-          type: "number",
-          sortable: true,
-          headerAlign: "center",
-          align: "center",
-          minWidth: 80,
-          flex: 0.5,
-        });
-      }
+    for (let i = 0; i < mainColumnData.length; i++) {
+      const stat = mainColumnData[i];
+      keys.push(stat.stat_key);
+      statColumns.push({
+        field: stat.stat_key,
+        headerName: stat.display_name,
+        type: "number",
+        sortable: true,
+        headerAlign: "center",
+        align: "center",
+        minWidth: 80,
+        flex: 0.5,
+      });
     }
+
     setShowKeys(keys);
     setStatDescription(data.data);
     setStatColumns(statColumns);
+
+    // Chart column
+    let chartColumnList = [];
+
+    for (let i = 0; i < data.charts.length; i++) {
+      let chartData = data.charts[i];
+      let chartColumns = [];
+      for (let j=0; j < chartData.fields.length; j++) {
+        let field = chartData.fields[j];
+        chartColumns.push({
+          index: j,
+          name: field.display_text,
+          key: field.key,
+          enabled: true
+        });
+      }
+      chartColumnList.push({
+        key: i,
+        title: chartData.name,
+        data: chartColumns
+      });
+    }
+    console.debug(chartColumnList)
+    setChartColumnList(chartColumnList);
   };
 
   const statisticsTeamOnClick = (cellValues) => {
@@ -245,22 +248,22 @@ const Tables = () => {
           team[key] = Number(team[key]);
         }
       }
-      team["elementsLow"] = (Number(team.autoLow) + Number(team.teleopLow)).toFixed(1);
-      team["elementsMid"] = (
-        Number(team.autoMidCones) +
-        Number(team.autoMidCubes) +
-        Number(team.teleopMidCones) +
-        Number(team.teleopMidCubes)
-      ).toFixed(1);
-      team["elementsHigh"] = (
-        Number(team.autoHighCones) +
-        Number(team.autoHighCubes) +
-        Number(team.teleopHighCones) +
-        Number(team.teleopHighCubes)
-      ).toFixed(1);
+      // team["elementsLow"] = (Number(team.autoLow) + Number(team.teleopLow)).toFixed(1);
+      // team["elementsMid"] = (
+      //   Number(team.autoMidCones) +
+      //   Number(team.autoMidCubes) +
+      //   Number(team.teleopMidCones) +
+      //   Number(team.teleopMidCubes)
+      // ).toFixed(1);
+      // team["elementsHigh"] = (
+      //   Number(team.autoHighCones) +
+      //   Number(team.autoHighCubes) +
+      //   Number(team.teleopHighCones) +
+      //   Number(team.teleopHighCubes)
+      // ).toFixed(1);
     }
     const sortedData = [...data.data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
-
+    console.debug(sortedData);
     setRankings(sortedData);
   };
 
@@ -504,7 +507,21 @@ const Tables = () => {
         <TabPanel value={tabIndex} index={1} dir={darkTheme.direction}>
           <div style={{ height: containerDivHeight, width: "100%" }}>
             <ThemeProvider theme={switchTheme}>
-              <BarChartWithSwitches
+              <Grid container spacing={2}>
+                {chartColumnList.map((data, index) => (
+                  <Grid item xs={12} key={index}>
+                    <Typography variant="h5" align="center" gutterBottom>
+                      {data.title}
+                    </Typography>
+                    <BarChartWithSwitches
+                      data={rankings}
+                      number={chartNumber}
+                      startingFields={data.data}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+              {/* <BarChartWithSwitches
                 data={rankings}
                 number={chartNumber}
                 startingFields={[
@@ -532,7 +549,7 @@ const Tables = () => {
                   { index: 1, name: "Middle", key: "elementsMid", enabled: true },
                   { index: 2, name: "High", key: "elementsHigh", enabled: true },
                 ]}
-              />
+              /> */}
             </ThemeProvider>
           </div>
         </TabPanel>

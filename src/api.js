@@ -1,4 +1,4 @@
-// const API_ENDPOINT = "http://172.19.55.26:8085";
+// const API_ENDPOINT = "http://172.24.48.1:8000";
 const API_ENDPOINT = "https://polarforecast.azurewebsites.net";
 
 const default_ttl = 5; //5 minutes expiry time
