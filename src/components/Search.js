@@ -38,6 +38,14 @@ const Search = (props) => {
         terms.push({ label: String(array[i].display), page: array[i].page });
       }
     }
+    
+    // Sort the terms array by year in descending order
+    terms.sort((a, b) => {
+      const yearA = parseInt(a.label.split(" ")[0]);
+      const yearB = parseInt(b.label.split(" ")[0]);
+      return yearB - yearA;
+    });
+
     setSearchKeys(terms);
   };
 

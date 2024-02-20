@@ -52,15 +52,46 @@ const Match = () => {
   const [statColumns, setStatColumns] = useState([]);
 
   const statisticsTeamOnClick = (cellValues) => {
-    history.push("team-" + cellValues.team);
+    history.push("team-" + cellValues.key);
+  };
+
+  const filterData = (data) => {
+    data = data.filter((obj) => {
+      if (obj.key) {
+        return true;
+      }
+    });
+    let oprList = [];
+
+    for (const team of data) {
+      if (team.key) {
+        team.key = team.key.replace("frc", "");
+      }
+      oprList.push(team.OPR);
+      for (const [key, value] of Object.entries(team)) {
+        if (
+          typeof value === "number" &&
+          key.toLowerCase() !== "rank" &&
+          key !== "expectedRanking" &&
+          key.toLowerCase() !== "schedule"
+        ) {
+          team[key] = team[key]?.toFixed(1);
+        } else {
+          team[key] = Number(team[key]);
+        }
+      }
+    }
+    const sortedData = [...data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
+    console.debug(sortedData);
+    return sortedData;
   };
 
   const matchInfoCallback = async (restData) => {
     setData(restData);
     console.debug(restData);
 
-    setBlueRows(restData?.blue_teams);
-    setRedRows(restData?.red_teams);
+    setBlueRows(filterData(restData?.blue_teams));
+    setRedRows(filterData(restData?.red_teams));
 
     if (restData?.match.winning_alliance === "red") {
       setRedWinner(true);
