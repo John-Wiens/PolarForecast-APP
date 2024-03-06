@@ -26,11 +26,17 @@ import React, { useEffect, useState } from "react";
 import { getLeaderboard } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { DataGrid, gridClasses, GridToolbar } from "@mui/x-data-grid";
-import Stack from "@mui/material/Stack";
+import { useHistory } from "react-router-dom";
 import { Box, CircularProgress } from "@mui/material";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import AppBar from "@mui/material/AppBar";
 
 const Index = () => {
+  const history = useHistory();
+  const tabDict = ["home", "teams", "events"];
   const theme = useTheme();
+  const [tabIndex, setTabIndex] = useState(0);
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
   const [containerHeight, setContainerHeight] = useState(`calc(100vh - 170px)`);
   const [leaderboardRows, setLeaderboardRows] = useState([]);
@@ -143,9 +149,36 @@ const Index = () => {
     }
   }, [isDesktop]);
 
+  function a11yProps(index) {
+    return {
+      id: `full-width-tab-${index}`,
+      "aria-controls": `full-width-tabpanel-${index}`,
+    };
+  }
+
+  const handleChange = (event, newValue) => {
+    history.push({ hash: tabDict[newValue] });
+    setTabIndex(newValue);
+  };
+
   return (
     <>
       <Header />
+      <AppBar position="static">
+        <Tabs
+          value={tabIndex}
+          onChange={handleChange}
+          indicatorColor="secondary"
+          textColor="inherit"
+          variant="fullWidth"
+          aria-label="full width tabs"
+        >
+          <Tab label="Home" {...a11yProps(0)} />
+          <Tab label="Teams" {...a11yProps(1)} />
+          <Tab label="Events" {...a11yProps(2)} />
+
+        </Tabs>
+      </AppBar>
       <div style={{ height: containerHeight, width: "100%" }}>
         <ThemeProvider theme={darkTheme}>
           <Container>
