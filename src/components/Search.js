@@ -22,31 +22,46 @@ import { getSearchKeys } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
 const Search = (props) => {
+  const startDate = "02-24"
+  const [years, setYears] = useState([]);
   const [searchKeys, setSearchKeys] = useState([]);
   const width = props.width || "300px";
 
   const searchKeyCallback = async (data) => {
     const terms = [];
     let array = [];
+    const uniqueYears = new Set(); // to store unique years
+  
     if (data?.data?.length > 0) {
       array = [...data.data];
     } else if (data?.length > 0) {
       array = [...data];
     }
+  
     for (let i = 0; i < array.length; i++) {
       if ("display" in array[i]) {
         terms.push({ label: String(array[i].display), page: array[i].page });
       }
+  
+      // Check if 'key' property exists and extract the year
+      if ("key" in array[i]) {
+        const year = array[i].key.substring(0, 4); // assuming the year is always the first 4 characters
+        uniqueYears.add(year);
+      }
     }
-    
+  
     // Sort the terms array by year in descending order
     terms.sort((a, b) => {
       const yearA = parseInt(a.label.split(" ")[0]);
       const yearB = parseInt(b.label.split(" ")[0]);
       return yearB - yearA;
     });
-
+  
     setSearchKeys(terms);
+  
+    // Log or return the unique years
+    console.log(Array.from(uniqueYears));
+    setYears(Array.from(uniqueYears));
   };
 
   useEffect(() => {

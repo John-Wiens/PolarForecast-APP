@@ -1,6 +1,6 @@
-import { Card, CardHeader, Container, Row } from "reactstrap";
+import { Card, CardHeader } from "reactstrap";
 import { useMediaQuery, useTheme } from "@mui/material";
-import { alpha, styled, ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -9,7 +9,7 @@ import Box from "@mui/material/Box";
 import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
-import { DataGrid, gridClasses, GridToolbar } from "@mui/x-data-grid";
+import { GridToolbar } from "@mui/x-data-grid";
 import { useHistory } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Snowfall from "react-snowfall";
@@ -19,6 +19,9 @@ import BarChartWithSwitches from "../components/BarChartWithSwitches";
 import Link from "@mui/material/Link";
 import "../assets/css/polar-css.css";
 import { Grid } from '@mui/material';
+import StripedDataGrid from '../components/StripedDataGrid.js';
+import PolarTheme from "../components/PolarTheme.js"; 
+import TabPanel from '../components/TabPanel.js';
 
 const switchTheme = createTheme({
   palette: {
@@ -248,19 +251,6 @@ const Tables = () => {
           team[key] = Number(team[key]);
         }
       }
-      // team["elementsLow"] = (Number(team.autoLow) + Number(team.teleopLow)).toFixed(1);
-      // team["elementsMid"] = (
-      //   Number(team.autoMidCones) +
-      //   Number(team.autoMidCubes) +
-      //   Number(team.teleopMidCones) +
-      //   Number(team.teleopMidCubes)
-      // ).toFixed(1);
-      // team["elementsHigh"] = (
-      //   Number(team.autoHighCones) +
-      //   Number(team.autoHighCubes) +
-      //   Number(team.teleopHighCones) +
-      //   Number(team.teleopHighCubes)
-      // ).toFixed(1);
     }
     const sortedData = [...data.data].sort((a, b) => Number(b.OPR) - Number(a.OPR));
     console.debug(sortedData);
@@ -385,31 +375,6 @@ const Tables = () => {
     }
   }, [isDesktop]);
 
-  function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-    return (
-      <div
-        role="tabpanel"
-        hidden={value !== index}
-        id={`full-width-tabpanel-${index}`}
-        aria-labelledby={`full-width-tab-${index}`}
-        {...other}
-      >
-        {value === index && (
-          <Box sx={{ display: "flex", flexDirection: "column", height: "calc(100vh - 210px)" }}>
-            <ThemeProvider theme={darkTheme}>
-              <Container>
-                <Row>
-                  <div style={{ height: containerHeight, width: "100%" }}>{children}</div>
-                </Row>
-              </Container>
-            </ThemeProvider>
-          </Box>
-        )}
-      </div>
-    );
-  }
-
   function a11yProps(index) {
     return {
       id: `full-width-tab-${index}`,
@@ -442,7 +407,7 @@ const Tables = () => {
         </Tabs>
       </AppBar>
       <div style={{ height: containerDivHeight, width: "100%", overflow: "auto" }}>
-        <TabPanel value={tabIndex} index={0} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={0} dir={PolarTheme.direction} containerHeight={containerHeight}>
           <Card className="polar-box">
             <CardHeader className="bg-transparent">
               <h3 className="text-white mb-0">Event Rankings - {eventTitle}</h3>
@@ -504,7 +469,7 @@ const Tables = () => {
             </div>
           </Card>
         </TabPanel>
-        <TabPanel value={tabIndex} index={1} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={1} dir={PolarTheme.direction}>
           <div style={{ height: containerDivHeight, width: "100%" }}>
             <ThemeProvider theme={switchTheme}>
               <Grid container spacing={2}>
@@ -521,39 +486,10 @@ const Tables = () => {
                   </Grid>
                 ))}
               </Grid>
-              {/* <BarChartWithSwitches
-                data={rankings}
-                number={chartNumber}
-                startingFields={[
-                  { index: 0, name: "Auto", key: "autoPoints", enabled: true },
-                  { index: 1, name: "Teleop", key: "teleopPoints", enabled: true },
-                  { index: 2, name: "Links", key: "linkPoints", enabled: true },
-                  { index: 3, name: "End Game", key: "endgamePoints", enabled: true },
-                ]}
-              />
-              <br />
-              <BarChartWithSwitches
-                data={rankings}
-                number={chartNumber}
-                startingFields={[
-                  { index: 0, name: "Teleop Elements", key: "teleopElementsScored", enabled: true },
-                  { index: 1, name: "Auto Elements", key: "autoElementsScored", enabled: true },
-                ]}
-              />
-              <br />
-              <BarChartWithSwitches
-                data={rankings}
-                number={chartNumber}
-                startingFields={[
-                  { index: 0, name: "Low", key: "elementsLow", enabled: true },
-                  { index: 1, name: "Middle", key: "elementsMid", enabled: true },
-                  { index: 2, name: "High", key: "elementsHigh", enabled: true },
-                ]}
-              /> */}
             </ThemeProvider>
           </div>
         </TabPanel>
-        <TabPanel value={tabIndex} index={2} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={2} dir={PolarTheme.direction}>
           <div style={{ height: containerHeight, width: "100%" }}>
             <Card className="polar-box">
               <CardHeader className="bg-transparent">
@@ -594,7 +530,7 @@ const Tables = () => {
             </Card>
           </div>
         </TabPanel>
-        <TabPanel value={tabIndex} index={3} dir={darkTheme.direction}>
+        <TabPanel value={tabIndex} index={3} dir={PolarTheme.direction}>
           <Card className="polar-box">
             <CardHeader className="bg-transparent">
               <h3 className="text-white mb-0">Eliminations - {eventTitle}</h3>
@@ -645,44 +581,5 @@ const Tables = () => {
     </>
   );
 };
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
-const ODD_OPACITY = 0.2;
-
-const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
-  [`& .${gridClasses.row}.even`]: {
-    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
-    "&:hover, &.Mui-hovered": {
-      backgroundColor: alpha("#78829c", ODD_OPACITY),
-      "@media (hover: none)": {
-        backgroundColor: "transparent",
-      },
-    },
-    "&.Mui-selected": {
-      backgroundColor: alpha(
-        theme.palette.primary.main,
-        ODD_OPACITY + theme.palette.action.selectedOpacity
-      ),
-      "&:hover, &.Mui-hovered": {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
-        ),
-        // Reset on touch devices, it doesn't add specificity
-        "@media (hover: none)": {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            ODD_OPACITY + theme.palette.action.selectedOpacity
-          ),
-        },
-      },
-    },
-  },
-}));
 
 export default Tables;

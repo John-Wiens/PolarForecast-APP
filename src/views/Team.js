@@ -1,22 +1,4 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.2
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import { Card, CardHeader, Container, Row } from "reactstrap";
-import { alpha, styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -27,11 +9,12 @@ import React, { useEffect, useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import { useHistory } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
-import { DataGrid, gridClasses } from "@mui/x-data-grid";
+import StripedDataGrid from '../components/StripedDataGrid.js';
+import PolarTheme from "../components/PolarTheme.js"; 
 
 const Team = () => {
   const history = useHistory();
@@ -377,9 +360,9 @@ const Team = () => {
           <Tab label="Team Stats" {...a11yProps(1)} />
         </Tabs>
       </AppBar>
-      <TabPanel value={value} index={0} dir={darkTheme.direction}>
+      <TabPanel value={value} index={0} dir={PolarTheme.direction}>
         <div style={{ height: "calc(100vh - 180px)", width: "100%", overflow: "auto" }}>
-          <ThemeProvider theme={darkTheme}>
+          <ThemeProvider theme={PolarTheme}>
             <Container>
               <Row>
                 <div style={{ height: "calc(100vh - 250px)", width: "100%" }}>
@@ -438,14 +421,14 @@ const Team = () => {
           </ThemeProvider>
         </div>
       </TabPanel>
-      <TabPanel value={value} index={1} dir={darkTheme.direction}>
+      <TabPanel value={value} index={1} dir={PolarTheme.direction}>
         <div style={{ height: "calc(100vh - 220px)", width: "100%", overflow: "auto" }}>
           <Container>
             {!loading ? (
               Object.keys(reportedStats).map((e, i) => {
                 const stat = reportedStats[i];
                 return (
-                  <ThemeProvider theme={darkTheme}>
+                  <ThemeProvider theme={PolarTheme}>
                     <Box
                       sx={{
                         bgcolor: "#429BEF",
@@ -494,44 +477,5 @@ const Team = () => {
     </>
   );
 };
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
-const ODD_OPACITY = 0.2;
-
-const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
-  [`& .${gridClasses.row}.even`]: {
-    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
-    "&:hover, &.Mui-hovered": {
-      backgroundColor: alpha("#78829c", ODD_OPACITY),
-      "@media (hover: none)": {
-        backgroundColor: "transparent",
-      },
-    },
-    "&.Mui-selected": {
-      backgroundColor: alpha(
-        theme.palette.primary.main,
-        ODD_OPACITY + theme.palette.action.selectedOpacity
-      ),
-      "&:hover, &.Mui-hovered": {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
-        ),
-        // Reset on touch devices, it doesn't add specificity
-        "@media (hover: none)": {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            ODD_OPACITY + theme.palette.action.selectedOpacity
-          ),
-        },
-      },
-    },
-  },
-}));
 
 export default Team;

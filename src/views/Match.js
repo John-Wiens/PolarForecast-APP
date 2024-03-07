@@ -31,6 +31,8 @@ import "../assets/css/polar-css.css";
 import { IconButton } from "@mui/material";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import StripedDataGrid from '../components/StripedDataGrid.js';
+import PolarTheme from "../components/PolarTheme.js"; 
 
 const Match = () => {
   const history = useHistory();
@@ -187,7 +189,7 @@ const Match = () => {
 
   return (
     <>
-      <ThemeProvider theme={darkTheme}>
+      <ThemeProvider theme={PolarTheme}>
         <div style={{ height: "calc(100vh - 132px)", width: "100%", overflow: "auto" }}>
           <Container>
             <Row>
@@ -314,44 +316,5 @@ const Match = () => {
     </>
   );
 };
-
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-  },
-});
-
-const ODD_OPACITY = 0.2;
-
-const StripedDataGrid = styled(DataGrid)(({ theme }) => ({
-  [`& .${gridClasses.row}.even`]: {
-    backgroundColor: alpha(theme.palette.primary.main, ODD_OPACITY),
-    "&:hover, &.Mui-hovered": {
-      backgroundColor: alpha("#78829c", ODD_OPACITY),
-      "@media (hover: none)": {
-        backgroundColor: "transparent",
-      },
-    },
-    "&.Mui-selected": {
-      backgroundColor: alpha(
-        theme.palette.primary.main,
-        ODD_OPACITY + theme.palette.action.selectedOpacity
-      ),
-      "&:hover, &.Mui-hovered": {
-        backgroundColor: alpha(
-          theme.palette.primary.main,
-          ODD_OPACITY + theme.palette.action.selectedOpacity + theme.palette.action.hoverOpacity
-        ),
-        // Reset on touch devices, it doesn't add specificity
-        "@media (hover: none)": {
-          backgroundColor: alpha(
-            theme.palette.primary.main,
-            ODD_OPACITY + theme.palette.action.selectedOpacity
-          ),
-        },
-      },
-    },
-  },
-}));
 
 export default Match;
