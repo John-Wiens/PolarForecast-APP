@@ -86,7 +86,21 @@ function BarChartWithSwitches({ data, number, startingFields }) {
                 name={item.key}
                 checked={fields[item.index].enabled}
                 onChange={handleSwitchChange}
-                color={muiPalette[item.index]}
+                // color={chartPalette[item.index]}
+                sx={{
+                  '& .MuiSwitch-thumb': {
+                    backgroundColor: chartPalette[item.index], // Custom thumb color
+                  },
+                  '& .MuiSwitch-track': {
+                    backgroundColor: chartPalette[item.index] + '80', // Semi-transparent track
+                  },
+                  '&.Mui-checked .MuiSwitch-thumb': {
+                    backgroundColor: chartPalette[item.index], // Ensure checked state has correct color
+                  },
+                  '&.Mui-checked .MuiSwitch-track': {
+                    backgroundColor: chartPalette[item.index] + '80',
+                  },
+                }}
                 size='small'
               />
             }
