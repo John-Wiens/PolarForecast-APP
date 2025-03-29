@@ -115,7 +115,7 @@ const Index = () => {
       if (team.key) {
         team.key = team.key.replace("frc", "");
       }
-      oprList.push(team.OPR);
+      oprList.push(Number(team.OPR));
       for (const [key, value] of Object.entries(team)) {
         if (
           typeof value === "number" &&
