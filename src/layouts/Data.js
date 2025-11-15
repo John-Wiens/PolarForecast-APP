@@ -16,7 +16,7 @@
 
 */
 import React from "react";
-import { useLocation, Route, Switch, Redirect } from "react-router-dom";
+import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 import { Container } from "reactstrap";
 import Footer from "components/Footers/Footer.js";
 import Selector from "views/Selector.js";
@@ -36,18 +36,13 @@ const Data = (props) => {
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/data" && prop.path === "/index") {
-        return <Route path={prop.layout + prop.path} component={prop.component} key={key} />;
+        return <Route path={prop.path} element={<prop.component />} key={key} />;
       } else if (prop.layout === "/data" && prop.path === "/event") {
         return (
-          <Route
-            path={prop.layout + prop.path}
-            render={({ match: { url } }) => (
-              <>
-                <Route path={`${url}/:id/:id`} component={prop.component} exact />
-                <Route path={`${url}/:id/:id/:id`} component={Selector} />
-              </>
-            )}
-          />
+          <Route key={key} path={`${prop.path}/*`}>
+            <Route path=":id/:id" element={<prop.component />} />
+            <Route path=":id/:id/:id" element={<Selector />} />
+          </Route>
         );
       } else {
         return null;
@@ -58,10 +53,10 @@ const Data = (props) => {
   return (
     <>
       <div className="main-content" ref={mainContent}>
-        <Switch>
+        <Routes>
           {getRoutes(routes)}
-          <Redirect from="*" to="/data/index" />
-        </Switch>
+          <Route path="*" element={<Navigate to="/data/index" replace />} />
+        </Routes>
       </div>
       <Footer />
     </>

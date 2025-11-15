@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Chart from "chart.js";
+import { Chart } from "chart.js";
 import { Card, CardHeader, Container, Row } from "reactstrap";
 import { useMediaQuery, useTheme } from "@mui/material";
 import { alpha, styled } from "@mui/material/styles";

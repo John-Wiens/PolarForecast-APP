@@ -28,13 +28,13 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Stack from "@mui/material/Stack";
 import { getStatDescription, getTeamStatDescription, getTeamMatchPredictions } from "api.js";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
 import { DataGrid, gridClasses } from "@mui/x-data-grid";
 
 const Team = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = React.useState(true);
   const [teamInfo, setTeamInfo] = React.useState("");
@@ -162,7 +162,7 @@ const Team = () => {
   const [matchesRows, setMatchesRows] = useState([]);
 
   const statisticsMatchOnClick = (cellValues) => {
-    history.push("match-" + cellValues.key);
+    navigate("match-" + cellValues.key);
   };
 
   const teamPredictionsCallback = async (data) => {
@@ -327,9 +327,12 @@ const Team = () => {
     getTeamStatDescription(year, eventKey, "frc" + team, teamStatsCallback);
   }, []);
 
-  useEffect(async () => {
-    await new Promise((r) => setTimeout(r, 100));
-    updateData(teamInfo, keys);
+  useEffect(() => {
+    const fetchData = async () => {
+      await new Promise((r) => setTimeout(r, 100));
+      updateData(teamInfo, keys);
+    };
+    fetchData();
   }, [teamInfo, keys]);
 
   function TabPanel(props) {

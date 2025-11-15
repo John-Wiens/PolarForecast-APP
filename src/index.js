@@ -16,20 +16,27 @@
 
 */
 import React from "react";
-import ReactDOM from "react-dom"; // Gets built in github, but fails in deployment
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 
 import "assets/plugins/nucleo/css/nucleo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "assets/scss/argon-dashboard-react.scss";
+
 import DataLayout from "layouts/Data.js";
 
-ReactDOM.render(
+// Get the root DOM node
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+// Render the app
+root.render(
   <BrowserRouter>
-    <Switch>
-      <Route path="/data" render={(props) => <DataLayout {...props} />} />
-      <Redirect from="/" to="/data/index" />
-    </Switch>
-  </BrowserRouter>,
-  document.getElementById("root")
+    <Routes>
+      <Route path="/data/*" element={<DataLayout />} />
+      <Route path="/" element={<Navigate to="/data/index" replace />} />
+    </Routes>
+  </BrowserRouter>
 );
+
+

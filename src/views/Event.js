@@ -10,7 +10,7 @@ import Header from "components/Headers/Header.js";
 import React, { useEffect, useState } from "react";
 import { getStatDescription, getRankings, getMatchPredictions, getSearchKeys } from "api.js";
 import { DataGrid, gridClasses, GridToolbar } from "@mui/x-data-grid";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Stack from "@mui/material/Stack";
 import Snowfall from "react-snowfall";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -38,7 +38,7 @@ const switchTheme = createTheme({
 });
 
 const Tables = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const tabDict = ["rankings", "charts", "quals", "elims"];
   const theme = useTheme();
   const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
@@ -207,20 +207,16 @@ const Tables = () => {
         data: chartColumns
       });
     }
-    console.debug(chartColumnList)
+    console.debug(chartColumnList);
     setChartColumnList(chartColumnList);
   };
 
   const statisticsTeamOnClick = (cellValues) => {
-    const url = new URL(window.location.href);
-    const eventKey = url.pathname.split("/")[4];
-    history.push(eventKey + "/team-" + cellValues.key);
+    navigate("team-" + cellValues.key);
   };
 
   const statisticsMatchOnClick = (cellValues) => {
-    const url = new URL(window.location.href);
-    const eventKey = url.pathname.split("/")[4];
-    history.push(eventKey + "/match-" + cellValues.key);
+    navigate("match-" + cellValues.key);
   };
 
   const rankingsCallback = async (data) => {
@@ -418,7 +414,7 @@ const Tables = () => {
   }
 
   const handleChange = (event, newValue) => {
-    history.push({ hash: tabDict[newValue] });
+    navigate({ hash: tabDict[newValue] });
     setTabIndex(newValue);
   };
 
