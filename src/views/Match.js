@@ -16,7 +16,7 @@
 
 */
 import { Card, CardHeader, Container, Row } from "reactstrap";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { alpha, styled } from "@mui/material/styles";
 import React, { useEffect, useState } from "react";
 import { getMatchDetails, getStatDescription } from "api.js";
@@ -33,7 +33,7 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 const Match = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
@@ -52,7 +52,7 @@ const Match = () => {
   const [statColumns, setStatColumns] = useState([]);
 
   const statisticsTeamOnClick = (cellValues) => {
-    history.push("team-" + cellValues.key);
+    navigate("team-" + cellValues.key);
   };
 
   const filterData = (data) => {
